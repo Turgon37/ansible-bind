@@ -1,0 +1,198 @@
+---
+# defaults file for bind
+
+# Simple placeholder to allow other roles to detect this role
+bind__role: True
+
+# List of packages to install
+bind__packages: []
+
+# The name of the system service
+#bind__service_name: bind9
+bind__checkconf_program: 'named-checkconf'
+bind__checkzone_program: 'named-checkzone'
+
+# Main configuration directory
+bind__config:  '{{ bind__config_dir }}/named.conf'
+bind__config_dir: /etc/bind
+
+# Directory with run-time stuff
+#bind__var_dir: 
+bind__var_data_dir: '{{ bind__var_dir }}/data'
+bind__pid_file: '{{ bind__var_dir }}/named.pid'
+
+# The use that bind will run as
+bind__runas_user: bind
+bind__runas_group: '{{ bind__runas_user }}'
+
+# Configure ACLs
+# each one must have {name: 'friendly name', 'match': ['any', '0.0.0.0/24']}
+bind__config_acls: "{{ bind__config_dir }}/named.conf.acls"
+bind__acls: []
+
+# Default location for rndc management key
+bind__rndc_keyfile: '{{ bind__config_dir }}/rndc.key'
+
+# Default network port to listen on
+bind__default_port: 53
+
+# Ipv4 settings
+bind__listen_on: '127.0.0.1'
+bind__listen_on_port: '{{ bind__default_port }}'
+# IPv6 settings
+bind__listen_on_v6: '::1'
+bind__listen_on_v6_port: '{{ bind__default_port }}'
+
+# Query restrictions
+bind__allow_query: 'localhost'
+bind__allow_query_on: 'any'
+bind__blackhole: 'none'
+
+# Recursions settings
+bind__recursion: "{{ false if bind__allow_recursion == 'none' else true }}"
+bind__allow_recursion: 'none'
+bind__allow_recursion_on: 'any'
+
+bind__empty_zones_enable: True
+bind__empty_contact: 'local@localhost'
+bind__empty_server: 'localhost'
+bind__disable_empty_zone: []
+
+bind__forward: 'first'
+bind__forwarders: []
+
+# Path to zones directory
+bind__static_zones_dir: '{{ bind__config_dir }}/zones'
+bind__dynamic_zones_dir: '{{ bind__config_dir }}/dynamic-zones'
+bind__root_server_hint_file: '{{ bind__config_dir }}/db.root'
+
+# the url from which to retrieve the root names servers list
+bind__root_server_source: 'https://www.internic.net//domain/named.cache'
+bind__root_server_source_checksum: 'sha256:2265e9862c5188841f21e906e67e3d9bd83b5bad1f4305c38b7bcd921c5ec406'
+
+# List of default zones
+bind__default_zones:
+  '.':
+    type: 'hint'
+    file: '{{ bind__root_server_hint_file }}'
+  'localhost.localdomain':
+    type: 'master'
+    file: 'auto'
+    allow_update: 'none'
+    entries:
+      - name: '@'
+        type: 'NS'
+        data: 'localhost.'
+      - name: '1.0.0'
+        type: 'PTR'
+        data: 'localhost.'
+  'localhost':
+    type: 'master'
+    file: 'auto'
+    entries:
+      - name: '@'
+        type: 'NS'
+        data: 'localhost.'
+      - name: '@'
+        type: 'A'
+        data: '127.0.0.1'
+      - name: '@'
+        type: 'AAAA'
+        data: '::1'
+  '127.in-addr.arpa':
+    type: 'master'
+    file: 'auto'
+    entries:
+      - name: '@'
+        type: 'NS'
+        data: 'localhost.'
+      - name: '1.0.0'
+        type: 'PTR'
+        data: 'localhost.'
+  '0.in-addr.arpa':
+    type: 'master'
+    file: 'auto'
+    entries:
+      - name: '@'
+        type: 'NS'
+        data: 'localhost.'
+  '255.in-addr.arpa':
+    type: 'master'
+    file: 'auto'
+    entries:
+      - name: '@'
+        type: 'NS'
+        data: 'localhost.'
+
+# This variable is intended to be used in Ansible’s global inventory.
+bind__global_zones: {}
+
+# This variable is intended to be used in a host inventory group of Ansible
+# (only one host group is supported).
+bind__group_zones: {}
+
+# This variable is intended to be used in the inventory of hosts.
+bind__host_zones: {}
+
+# Combine all enabled mods
+bind__zones: '{{ bind__default_zones
+                     | combine(bind__global_zones)
+                     | combine(bind__group_zones)
+                     | combine(bind__host_zones) }}'
+
+bind__zones_default_ttl: 604800
+
+bind__zones_entry_default:
+  SOA:
+    data:
+      serial: "{{ ansible_date_time.year + ansible_date_time.month + ansible_date_time.day + '00' }}"
+      refresh: 604800
+      retry: 86400
+      expiry: 2419200
+      negative: 604800
+
+# List of allowed RR class
+bind__allowed_rr_class:
+  - IN
+
+# List of allowed RR type
+bind__allowed_rr_types:
+  - A
+  - AAAA
+  - AFSDB
+  - APL
+  - CAA
+  - CDNSKEY
+  - CDS
+  - CERT
+  - CNAME
+  - DHCID
+  - DLV
+  - DNAME
+  - DNSKEY
+  - DS
+  - HIP
+  - IPSECKEY
+  - KEY
+  - KX
+  - LOC
+  - MX
+  - NAPTR
+  - NS
+  - NSEC
+  - NSEC3
+  - NSEC3PARAM
+  - OPENPGPKEY
+  - PTR
+  - RP
+  - RRSIG
+  - SIG
+  - SOA
+  - SRV
+  - SSHFP
+  - TA
+  - TKEY
+  - TLSA
+  - TSIG
+  - TXT
+  - URI

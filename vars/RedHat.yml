@@ -1,0 +1,22 @@
+---
+# vars file for bind (RedHat specific)
+
+bind__packages:
+  - bind
+  - bind-utils
+
+bind__service_name: named
+
+bind__config_dir: /etc/named
+
+bind__runas_user: named
+
+# Main config file
+bind__config: /etc/named.conf
+
+# Directory with run-time stuff
+bind__var_dir: /var/named
+
+bind__pid_file: /run/named/named.pid
+
+bind__rndc_keyfile: '/etc/rndc.key'

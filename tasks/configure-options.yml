@@ -1,0 +1,45 @@
+---
+
+- name: Install named.conf
+  become: yes
+  template:
+    src: named.conf.j2
+    dest: "{{ bind__config }}"
+    owner: root
+    group: root
+    mode: 0644
+    #validate: "{{ bind__checkconf_program }} %s"
+  notify: [ 'restart-bind' ]
+
+###### ACL
+- name: Install named.conf.acls
+  become: yes
+  template:
+    src: named.conf.acls.j2
+    dest: "{{ bind__config_acls }}"
+    owner: root
+    group: root
+    mode: 0644
+    #validate: "{{ bind__checkconf_program }} {{ bind__config }}"
+  when: bind__acls | length > 0
+  notify: [ 'restart-bind' ]
+
+- name: Uninstall named.conf.acls
+  become: yes
+  file:
+    path: "{{ bind__config_acls }}"
+    state: absent
+  when: bind__acls | length == 0
+  notify: [ 'restart-bind' ]
+
+### OPTIONS
+- name: Install named.conf.options
+  become: yes
+  template:
+    src: named.conf.options.j2
+    dest: "{{ bind__config_dir }}/named.conf.options"
+    owner: root
+    group: root
+    mode: 0644
+    #validate: "{{ bind__checkconf_program }} {{ bind__config }}"
+  notify: [ 'restart-bind' ]

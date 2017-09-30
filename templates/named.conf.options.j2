@@ -1,0 +1,140 @@
+{%- import '_macros.j2' as macros with context -%}
+//
+// {{ ansible_managed }}
+//
+
+options {
+    ////// MAIN CONFIGURATION
+
+    // Setting working directory
+    directory "{{ bind__var_dir }}";
+    // Daemon pid file
+    pid-file "{{ bind__pid_file }}";
+    // Where the public and private key for dynamic update
+    //key-directory "";
+
+    // Maximum memory amount to use for cache
+    //max-cache-size 32M;
+
+    //// Statistic options
+    // File to dump the database
+    dump-file "{{ bind__var_data_dir }}/cache_dump.db";
+    // File to write the memory stats on close
+    memstatistics-file "{{ bind__var_data_dir }}/bind_mem_stats.txt";
+    // The file in which the server append statistics when using rdnc stats
+    statistics-file "{{ bind__var_data_dir }}/bind_stats.txt";
+    // Enables the collection of statistics on areas
+    //zone-statistics yes;
+
+    ////// VISIBLE CONFIGURATION
+    // Version should be report by version.bind
+    version "Unknown";
+    // Hostname should be report by hostname.bind
+    hostname none;
+    // ID should be report by ID.SERVER
+    server-id none;
+
+    ////// NETWORK CONFIGURATION
+    // The port use to send/receive dns data
+    port {{ bind__default_port }};
+    // On which ipv4 interface to listen
+    listen-on port {{ bind__listen_on_port }} { {{ macros.listify(bind__listen_on) }} };
+    // On which ipv6 interface to listen
+    listen-on-v6 port {{ bind__listen_on_v6_port }} { {{ macros.listify(bind__listen_on_v6) }} };
+    // What address/port to use for forward request
+    //query-source address * port *;
+    //query-source-v6 * port *;
+
+    // Maximum number of simultaneous client TCP connections
+    //tcp-clients 10;
+
+    //// REQUEST FORWARDING
+    // Define forwarding behaviour
+    // If first, query forwarders first then the server himself
+    // If only, query only the forwarders
+    // Values: first, only
+    forward {{ bind__forward }};
+
+    // List of forwarders
+    forwarders {
+{% for forward in bind__forwarders %}
+{%   if forward is string or forward is iterable %}
+      {{ macros.listify(forward) }}
+{%   elif forward is mapping %}
+      {{ macros.listify(forward) }}
+{%   endif %}
+{% endfor %}
+    };
+
+    ////// REQUEST PERMISSIONS
+    // List of hosts to server will respond to
+    allow-query { {{ macros.listify(bind__allow_query) }} };
+    // List of interfaces the server will respond to
+    allow-query-on { {{ macros.listify(bind__allow_query_on) }} };
+    // Blackhole for these host, no request will be solve from they
+    blackhole { {{ macros.listify(bind__blackhole) }} };
+
+    ////// REQUEST RECURSION
+    // Allow recursive search (by using root server)
+    recursion {{ bind__recursion | ternary('yes', 'no') }};
+{% if bind__recursion %}
+    // Which hosts are allowed to make recursive queries
+    allow-recursion { {{ macros.listify(bind__allow_recursion) }} };
+    // Which interfaces are allowed to make recursive queries
+    allow-recursion-on { {{ macros.listify(bind__allow_recursion_on) }} };
+{% endif %}
+
+    //// ZONES CONFIGURATION
+    // Enable or not automatically generated empty zones
+    empty-zones-enable {{ bind__empty_zones_enable | ternary('yes', 'no') }};
+    // Default email address for empty generated zones
+    empty-contact "{{ macros.emailify(bind__empty_contact) }}";
+    // Default NS entry for empty generated zones
+    empty-server "{{ bind__empty_server }}";
+
+    {% for zone in bind__disable_empty_zone %}
+    disable-empty-zone "{{ zone }}";
+    {% endfor %}
+
+    ////// DYNAMIC DNS UPDATE
+    // List of IP address of host that are allowed to send dynamic dns entries for this server's master zones
+    //allow-update { none; };
+
+    // Which host are allowed to submit Dynamic DNS update to slaves server's zones
+    //allow-update-forwarding { none; };
+
+
+
+	////// TRANSFER ZONE CONFIGURATION      
+	//// Authorization
+	// List of IP address of server that are allowed to copy (transfer) the zone's informations from this server
+	//allow-transfer { none; };
+
+	// Send notify to slave server when a zone's file change
+	// Values: yes, no, explicit (only send notify to also-notify{})
+	//notify no;
+
+	// Which server are allowed to notify this server (for slave only)
+	//allow-notify { none; };
+
+	// List of IP addressses of server that are also sent notify when a zone is modified
+	//also-notify {  };
+
+
+	//// Notify informations
+	// Address to use for 'from' field when an notify is send from this server to other
+	//notify-source *;
+	//notify-source-v6 *;
+
+
+	//========================================================================
+	// If BIND logs error messages about the root key being expired,
+	// you will need to update your keys.  See https://www.isc.org/bind-keys
+	//========================================================================
+	//dnssec-validation no;
+
+    ////// OTHERS
+
+    // conform to RFC1035
+    auth-nxdomain no;
+};

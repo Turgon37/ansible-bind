@@ -1,0 +1,14 @@
+//
+// {{ ansible_managed }}
+//
+
+// This file contains the acl (Access Control List) definitions for host
+
+{% for acl in bind__acls %}
+acl "{{ acl.name }}" {
+{%   for match in acl.match_list %}
+  {{ match }};
+{% endfor %}
+};
+
+{% endfor %}

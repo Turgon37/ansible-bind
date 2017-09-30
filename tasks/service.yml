@@ -1,0 +1,7 @@
+---
+
+- name: Ensure bind is started and enabled on boot
+  service:
+    name: "{{ bind__service_name }}"
+    enabled: yes
+    state: started

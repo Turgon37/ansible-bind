@@ -1,0 +1,60 @@
+---
+
+### ZONES
+- name: Install named.conf.zones
+  template:
+    src: named.conf.zones.j2
+    dest: "{{ bind__config_dir }}/named.conf.zones"
+    owner: root
+    group: root
+    mode: 0644
+    #validate: "{{ bind__checkconf_program }} {{ bind__config }}"
+  notify: [ 'restart-bind' ]
+
+- name: Download list of root server
+  get_url:
+    url: '{{ bind__root_server_source }}'
+    dest: '{{ bind__root_server_hint_file }}'
+    mode: 0644
+    backup: yes
+    force: yes
+    checksum: '{{ bind__root_server_source_checksum|d(omit) }}'
+  notify: [ 'restart-bind' ]
+
+- name: Get current zones serial
+  command: "grep  '; Serial' '{{ bind__static_zones_dir }}/db.{{ item.key|replace(' ', '') }}' "
+  with_dict: '{{ bind__zones }}'
+  when: item.value.type in ['master']
+  register: _bind__zones_serial_raw
+  failed_when: _bind__zones_serial_raw.rc == 2
+  changed_when: False
+
+- name: Init all zones serial
+  set_fact:
+    _bind__zones_serial: {}
+
+- name: Register all zones serial
+  set_fact:
+    _bind__zones_serial: "{{ _bind__zones_serial|d({})|combine(  {item.item.key: item.stdout|regex_search('[0-9]+') }   ) }}"
+  with_items: '{{ _bind__zones_serial_raw.results }}'
+  when: item.rc is defined and item.rc == 0
+
+- name: Generate new Serial for bad formatted serial
+  set_fact:
+    _bind__zones_serial: "{{ _bind__zones_serial|d({})|combine(  {item.key: bind__zones_entry_default['SOA']['data']['serial']}  ) }}"
+  when: not (   item.value|regex_search('2[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}')   )
+  with_dict: '{{ _bind__zones_serial }}'
+
+- name: Install zone files for masters zones
+  template:
+    src: zone.j2
+    dest: "{{ bind__static_zones_dir + '/db.' + (item.key|replace(' ', '')) if item.value.file|d('auto') == 'auto' else item.value.file }}"
+    owner: root
+    group: root
+    mode: 0644
+    validate: "{{ bind__checkzone_program }} '{{ item.key }}' %s"
+  with_dict: '{{ bind__zones }}'
+  when: item.value.type in ['master']
+  check_mode: yes
+  register: _bind__zone_templates
+  notify: [ 'restart-bind' ]

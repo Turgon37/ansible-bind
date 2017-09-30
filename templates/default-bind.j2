@@ -1,0 +1,9 @@
+#
+# {{ ansible_managed }}
+#
+
+# run resolvconf?
+RESOLVCONF=no
+
+# startup options for the server
+OPTIONS="-u {{ bind__runas_user }}"

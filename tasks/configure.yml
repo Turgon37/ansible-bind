@@ -1,0 +1,55 @@
+---
+
+- name: Install bind default configuration file
+  template:
+    src: default-bind.j2
+    dest: "{{ bind__default_file }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_distribution == 'Debian'
+  notify: [ 'restart-bind' ]
+
+- name: Ensure bind configuration directories exists
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: "{{ bind__runas_group }}"
+    mode: 0750
+  with_items:
+    - '{{ bind__config_dir }}'
+    - '{{ bind__static_zones_dir }}'
+
+- name: Ensure bind dynamic zones configuration directory exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ bind__runas_user }}"
+    group: "{{ bind__runas_group }}"
+    mode: 0770
+  with_items: '{{ bind__dynamic_zones_dir }}'
+
+- name: "Ensure bind user '{{ bind__runas_user }}' is present"
+  user:
+    name: "{{ bind__runas_user }}"
+    group: "{{ bind__runas_group }}"
+    shell: /bin/false
+    createhome: no
+    system: yes
+    state: present
+  notify: [ 'restart-bind' ]
+
+- name: Ensure temporary data directory exists
+  file:
+    path: "{{ bind__var_data_dir }}"
+    owner: "{{ bind__runas_user }}"
+    group: "{{ bind__runas_group }}"
+    mode: 0770
+    state: directory
+
+- import_tasks: configure-options.yml
+  tags: ['bind', 'bind-configure-options']
+
+- import_tasks: configure-zones.yml
+  tags: ['bind', 'bind-configure-zones']

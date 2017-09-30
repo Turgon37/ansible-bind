@@ -1,0 +1,46 @@
+{%- import '_macros.j2' as macros with context -%}
+;
+; {{ ansible_managed }}
+;
+
+; This file contains the zone declarations for zone {{ item.key }}
+{% set zone = item.value %}
+{% set domain = item.key %}
+{% set auto_soa = true %}
+{% set first_ns = [] %}
+{% for entry in zone.entries | d([]) %}
+{%   if entry.type == 'SOA' %}
+{%     set auto_soa = false %}
+{%   elif entry.type == 'NS' and first_ns | length == 0 %}
+{%     set _ = first_ns.append(entry.data) %}
+{%   endif %}
+{% endfor %}
+
+$TTL {{ zone.ttl | d(bind__zones_default_ttl) }}
+$ORIGIN {{ macros.fqdn(domain) }}
+
+{% if auto_soa %}
+{{ macros.rr(  {'name':'@',
+                'type':'SOA',
+                'data': bind__zones_entry_default['SOA']['data'] | combine({
+                  'ns': first_ns | join(''),
+                  'mail': zone.email | d(bind__empty_contact),
+                  'serial': _bind__zones_serial[domain]|d( bind__zones_entry_default['SOA']['data']['serial'] )
+                })
+              }) }}
+{% else %}
+{%   for entry in zone.entries | d([]) %}
+{%     if entry.type == 'SOA' %}
+{{ macros.rr(entry) }}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+;
+{% for entry in zone.entries | d([]) %}
+{%   if entry.type == 'SOA' %}
+{%   else %}
+{{ macros.rr(entry) }}
+{%   endif %}
+{% endfor %}
+
+

@@ -1,0 +1,20 @@
+//
+// {{ ansible_managed }}
+//
+
+// This is the primary configuration file for the BIND DNS server named.
+
+{% if bind__acls | length > 0 %}
+// Define ACL
+include "{{ bind__config_acls }}";
+{% endif %}
+
+// Load internal options
+include "{{ bind__config_dir }}/named.conf.options";
+
+// Load zones
+include "{{ bind__config_dir }}/named.conf.zones";
+
+
+#include "{{ bind__config_dir }}/named.conf.local";
+#include "{{ bind__config_dir }}/named.conf.default-zones";
