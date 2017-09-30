@@ -1,7 +1,6 @@
 ---
 
 - name: Install named.conf
-  become: yes
   template:
     src: named.conf.j2
     dest: "{{ bind__config }}"
@@ -13,7 +12,6 @@
 
 ###### ACL
 - name: Install named.conf.acls
-  become: yes
   template:
     src: named.conf.acls.j2
     dest: "{{ bind__config_acls }}"
@@ -25,7 +23,6 @@
   notify: [ 'restart-bind' ]
 
 - name: Uninstall named.conf.acls
-  become: yes
   file:
     path: "{{ bind__config_acls }}"
     state: absent
@@ -34,7 +31,6 @@
 
 ### OPTIONS
 - name: Install named.conf.options
-  become: yes
   template:
     src: named.conf.options.j2
     dest: "{{ bind__config_dir }}/named.conf.options"
