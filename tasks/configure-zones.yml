@@ -55,6 +55,5 @@
     validate: "{{ bind__checkzone_program }} '{{ item.key }}' %s"
   with_dict: '{{ bind__zones }}'
   when: item.value.type in ['master']
-  check_mode: yes
   register: _bind__zone_templates
   notify: [ 'restart-bind' ]
