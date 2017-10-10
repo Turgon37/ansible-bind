@@ -2,7 +2,7 @@ galaxy_info:
   author: Pierre GINDRAUD
   description: This role configure the BIND dns server
   license: MIT
-  min_ansible_version: 1.2
+  min_ansible_version: 2.4
   platforms:
     - name: Debian
       versions:
