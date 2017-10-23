@@ -67,8 +67,8 @@ bind__dynamic_zones_dir: '{{ bind__config_dir }}/dynamic-zones'
 bind__root_server_hint_file: '{{ bind__config_dir }}/db.root'
 
 # the url from which to retrieve the root names servers list
-bind__root_server_source: 'https://www.internic.net//domain/named.cache'
-bind__root_server_source_checksum: 'sha256:2265e9862c5188841f21e906e67e3d9bd83b5bad1f4305c38b7bcd921c5ec406'
+bind__root_server_source: 'https://www.internic.net/domain/named.cache'
+bind__root_server_source_checksum: 'sha256:2069d51453d944ee6f2378c5650df436b96dbcf188f6286cced7d603dc2d07e8'
 
 # List of default zones
 bind__default_zones:

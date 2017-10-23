@@ -5,7 +5,7 @@
 
 // This file contains the zone declarations
 
-{% for name, zone in bind__zones | dictsort %}
+{% for name, zone in bind__zones|dictsort %}
 {{ macros.zone(name, zone) }}
 
 {% endfor %}
