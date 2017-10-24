@@ -20,7 +20,7 @@
     force: yes
     checksum: '{{ bind__root_server_source_checksum|d(omit) }}'
   ignore_errors: '{{ bind__root_server_source_ignore|bool }}'
-  notify: [ 'restart-bind' ]
+  notify: [ 'reload-bind' ]
 
 - name: Get current zones serial
   command: "grep  '; Serial' '{{ bind__static_zones_dir }}/db.{{ item.key|replace(' ', '') }}' "
@@ -55,5 +55,35 @@
     validate: "{{ bind__checkzone_program }} '{{ item.key }}' %s"
   with_dict: '{{ bind__zones }}'
   when: item.value.type in ['master']
-  register: _bind__zone_templates
-  notify: [ 'restart-bind' ]
+  register: _bind__masters_zones_templates
+  notify: [ 'reload-bind' ]
+
+- name: Update serial for changed zones
+  set_fact:
+    _bind__zones_serial: "{{ _bind__zones_serial|
+                              combine(
+                                {
+                                  item.item.key:
+                                    (
+                                      _bind__zones_serial[item.item.key][:-2]~( '%02d'|format( _bind__zones_serial[item.item.key][-2:]|int + 1) )
+                                      if _bind__zones_serial[item.item.key][:-2]|match(bind__zones_entry_default['SOA']['data']['serial'][:-2])
+                                      else bind__zones_entry_default['SOA']['data']['serial']
+                                    )
+                                }
+                              ) }}"
+  when: item|changed
+  with_items: '{{ _bind__masters_zones_templates.results }}'
+  check_mode: no
+
+- name: Install zone files for masters zones
+  template:
+    src: zone.j2
+    dest: "{{ bind__static_zones_dir + '/db.' + (item.key|replace(' ', '')) if item.value.file|d('auto') == 'auto' else item.value.file }}"
+    owner: root
+    group: root
+    mode: 0644
+    validate: "{{ bind__checkzone_program }} '{{ item.key }}' %s"
+  with_dict: '{{ bind__zones }}'
+  when: item.value.type in ['master']
+  register: _bind__zones_templates
+  notify: [ 'reload-bind' ]
