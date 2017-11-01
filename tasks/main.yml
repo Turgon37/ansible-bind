@@ -23,3 +23,6 @@
 
 - import_tasks: service.yml
   tags: ['bind', 'bind-service']
+
+- include_tasks: facts.yml
+  when: bind__facts|bool

@@ -4,6 +4,9 @@
 # Simple placeholder to allow other roles to detect this role
 bind__role: True
 
+# Enable facts deploiement
+bind__facts: True
+
 # List of packages to install
 bind__packages: []
 
