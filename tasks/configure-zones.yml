@@ -36,14 +36,12 @@
     _bind__zones_serial: "{{ _bind__zones_serial|d({})|combine(  {item.item.key: item.stdout|regex_search('[0-9]+') }   ) }}"
   with_items: '{{ _bind__zones_serial_raw.results }}'
   when: item.rc is defined and item.rc == 0
-  check_mode: no
 
 - name: Generate new Serial for bad formatted serial
   set_fact:
     _bind__zones_serial: "{{ _bind__zones_serial|d({})|combine(  {item.key: bind__zones_entry_default['SOA']['data']['serial']}  ) }}"
   when: not (   item.value|regex_search('2[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}')   )
   with_dict: '{{ _bind__zones_serial }}'
-  check_mode: no
 
 - name: Install zone files for masters zones
   template:
@@ -71,9 +69,8 @@
                                     )
                                 }
                               ) }}"
-  when: item|changed
+  when: item|changed and item.item.key in _bind__zones_serial
   with_items: '{{ _bind__masters_zones_templates.results }}'
-  check_mode: no
 
 - name: Install zone files for masters zones
   template:
