@@ -71,7 +71,7 @@ bind__root_server_hint_file: '{{ bind__config_dir }}/db.root'
 
 # the url from which to retrieve the root names servers list
 bind__root_server_source: 'https://www.internic.net/domain/named.cache'
-bind__root_server_source_checksum: 'sha256:b473c67170da189953c3bf88891084cd63a44302d036515ccc0f69448973b96d'
+bind__root_server_source_checksum: 'sha256:31fcf8354bf4e1ea35090be866ae63b65fc6d7597800a7f8141e066f3776d416'
 bind__root_server_source_ignore: false
 
 # List of default zones
