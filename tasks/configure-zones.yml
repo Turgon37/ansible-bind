@@ -72,7 +72,7 @@
   when: item|changed and item.item.key in _bind__zones_serial
   with_items: '{{ _bind__masters_zones_templates.results }}'
 
-- name: Install zone files for masters zones
+- name: Install zone files for masters zones (with new serials)
   template:
     src: zone.j2
     dest: "{{ bind__static_zones_dir + '/db.' + (item.key|replace(' ', '')) if item.value.file|d('auto') == 'auto' else item.value.file }}"
