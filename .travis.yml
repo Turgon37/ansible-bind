@@ -30,4 +30,3 @@ script:
   - 'docker exec --tty ${container_id} env TERM=xterm which named'
   - 'docker exec --tty ${container_id} env TERM=xterm /usr/bin/env named -v'
   - 'docker exec --tty ${container_id} env TERM=xterm "dig +noall +answer server1.test.local | grep 192.168.1.1"'
-   dig +noall +answer google.com | awk '{ print $5 }'
