@@ -1,0 +1,10 @@
+
+bind__allow_recursion: '{{ bind__allow_query }}'
+
+bind__global_zones:
+  'test.local':
+    type: 'master'
+    file: 'auto'
+    entries:
+      - { name: '@',        type: 'NS',     data: 'localhost.'}
+      - { name: 'server1',  type: 'A',      data: '192.168.1.1' }

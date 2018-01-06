@@ -1,0 +1,33 @@
+---
+language: bash
+
+# Tell Travis to start Docker when it brings up an environment.
+services:
+  - docker
+
+env:
+  # Provide a list of OSes we want to use for testing.
+  - DISTRIBUTION: debian8
+  - DISTIRBUTION: debian9
+  - DISTIRBUTION: centos7
+
+script:
+  # Configure test script so we can run extra tests after playbook is run.
+  - export CLEANUP=false
+
+  # Download test shim.
+  - wget -O ${PWD}/tests/test.sh https://gist.githubusercontent.com/Turgon37/5b6e6553ef92dc65d1c7df3e1a1e290e/raw/
+  - chmod +x ${PWD}/tests/test.sh
+
+  # Run tests.
+  - ${PWD}/tests/test.sh
+  - export container_id=$(cat /tmp/container_id)
+
+  #
+  ## Specific roles tests
+  #
+  # Ensure Bind is installed.
+  - 'docker exec --tty ${container_id} env TERM=xterm which named'
+  - 'docker exec --tty ${container_id} env TERM=xterm /usr/bin/env named -v'
+  - 'docker exec --tty ${container_id} env TERM=xterm "dig +noall +answer server1.test.local | grep 192.168.1.1"'
+   dig +noall +answer google.com | awk '{ print $5 }'
