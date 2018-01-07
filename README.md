@@ -64,6 +64,7 @@ Each zone statement represent the zone declaration with settings and the zone "b
 
 * In case of a static zone (aka master), you can use the following settings
 
+```
 bind__global_zones:
   'zone name':
     type: 'master' to declare a static zone or 'slave' to set a zone
@@ -71,15 +72,18 @@ bind__global_zones:
     entries:
       - zone entry statement (see below)
       - zone entry statement
+```
 
 * In case of a slave zone, you can use the following settings
 
+```
 bind__global_zones:
   'zone name':
     type: 'master' to declare a static zone or 'slave' to set a zone
     file: 'auto' to let ansible manage the path to the zone file or specify manually a path
     masters: String or list of masters servers
     allow_update: Optionnal String or list of servers allowed to perform an update
+```
 
 ### Zone entry statements
 
@@ -128,7 +132,7 @@ Some RR types are implemented directly by this role, so you have to format the '
 
 This is the list of specifically implemented types :
 
-* [SOA](#SOA-type)
+* [SOA](#soa-type)
 
 #### SOA type
 
