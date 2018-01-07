@@ -48,6 +48,6 @@ script:
   - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $6 }' |  grep --extended-regexp "^admin\.example\.com.$"
 
   # TEST-SOA.4 Ensure that SOA serial is correctly updated on zone change (test SOA.4)
-  - sed -i 's/# TEST-SOA.4/      - { name: '\''server2'\'',  type: '\''A'\'', data: '\''192.168.1.1'\'' }/' tests/group_vars/all.yml
+  - "sed -i 's/# TEST-SOA.4/      - { name: '\''server2'\'',  type: '\''A'\'', data: '\''192.168.1.1'\'' }/' tests/group_vars/all.yml"
   - docker exec $CONTAINER_ID env TERM=xterm env ANSIBLE_FORCE_COLOR=1 ansible-playbook /etc/ansible/roles/role_under_test/tests/$PLAYBOOK $ansible_options
   - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' | grep "$(date '+%Y%m%d01')"
