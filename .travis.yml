@@ -30,6 +30,6 @@ script:
   - docker exec --tty ${container_id} env TERM=xterm which named
   - docker exec --tty ${container_id} env TERM=xterm /usr/bin/env named -v
   # Ensure the configured RR entry is set
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer server1.test.local @localhost | grep 192.168.1.1
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer A server1.test.local @localhost | grep 192.168.1.1
   # Ensure the automaticcly generated SOA serial is valid
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA nancy.pierregindraud.net | awk '{ print $7 }' | grep "$(date '+%Y%m%d00')"
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' | grep "$(date '+%Y%m%d00')"
