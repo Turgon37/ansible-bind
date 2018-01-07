@@ -40,3 +40,5 @@ script:
   - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' | grep "$(date '+%Y%m%d00')"
   # Ensure that manual set SOA is correctly respected
   - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $7 }' | grep --extended-regexp "^20101010$"
+  # Ensure that email address is correctly encoded
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $6 }' |  grep --extended-regexp "^admin\.example\.com.$"
