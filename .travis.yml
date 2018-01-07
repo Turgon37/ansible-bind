@@ -40,15 +40,15 @@ script:
   ## Tests SOA features
   - printf ${blue}"Test DNS RR SOA record features."${neutral}
   # TEST-SOA.1 Ensure the automaticcly generated SOA serial is valid
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' | ensureEquals "$(date '+%Y%m%d00')"
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local @localhost | awk '{ print $7 }' | ensureEquals "$(date '+%Y%m%d00')"
 
   # TEST-SOA.2 Ensure that manual set SOA is correctly respected
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $7 }' | ensureEquals '20101010'
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local @localhost | awk '{ print $7 }' | ensureEquals '20101010'
 
   # TEST-SOA.3 Ensure that email address is correctly encoded
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $6 }' |  ensureEquals 'admin.example.com.'
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local @localhost | awk '{ print $6 }' |  ensureEquals 'admin.example.com.'
 
   # TEST-SOA.4 Ensure that SOA serial is correctly updated on zone change (test SOA.4)
   - "sed -i 's/# TEST-SOA.4/      - { name: '\''server2'\'',  type: '\''A'\'', data: '\''192.168.1.1'\'' }/' tests/group_vars/all.yml"
   - test_run_playbook
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' | ensureEquals "$(date '+%Y%m%d01')"
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local @localhost | awk '{ print $7 }' | ensureEquals "$(date '+%Y%m%d01')"
