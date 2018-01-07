@@ -15,3 +15,4 @@ bind__global_zones:
       - { name: '@',        type: 'SOA',    data: {ns: 'server1', email: 'admin@example.com', serial: "20101010", refresh: 604800, retry: 86400, expiry: 2419200, negative: 604800}},
       - { name: '@',        type: 'NS',     data: 'localhost.'}
       - { name: 'server1',  type: 'A',      data: '192.168.1.1' }
+# TEST-SOA.4
