@@ -29,7 +29,14 @@ script:
   # Ensure Bind is installed.
   - docker exec --tty ${container_id} env TERM=xterm which named
   - docker exec --tty ${container_id} env TERM=xterm /usr/bin/env named -v
+
+  ## Tests Zone RR entries
   # Ensure the configured RR entry is set
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer NS test.local @localhost | grep localhost
   - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer A server1.test.local @localhost | grep 192.168.1.1
+
+  ## Tests SOA features
   # Ensure the automaticcly generated SOA serial is valid
   - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' | grep "$(date '+%Y%m%d00')"
+  # Ensure that manual set SOA is correctly respected
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $7 }' | grep --extended-regexp "^20101010$"
