@@ -11,7 +11,9 @@ bind__facts: True
 bind__packages: []
 
 # The name of the system service
-#bind__service_name: bind9
+bind__service_name: bind9
+bind__service_enabled: True
+
 bind__checkconf_program: 'named-checkconf'
 bind__checkzone_program: 'named-checkzone'
 

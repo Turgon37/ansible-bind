@@ -5,8 +5,6 @@ bind__packages:
   - bind9
   - bind9utils
 
-bind__service_name: bind9
-
 bind__default_file: /etc/default/bind9
 
 # Directory with run-time stuff

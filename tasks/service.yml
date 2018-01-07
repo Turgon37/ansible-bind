@@ -2,6 +2,6 @@
 
 - name: Ensure bind is started and enabled on boot
   service:
-    name: "{{ bind__service_name }}"
-    enabled: yes
-    state: started
+    name:    '{{ bind__service_name }}'
+    enabled: '{{ bind__service_enabled|bool }}'
+    state:   "{{ bind__service_enabled|bool|ternary('started', 'stopped') }}"
