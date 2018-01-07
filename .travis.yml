@@ -30,26 +30,25 @@ script:
   - docker exec --tty ${container_id} env TERM=xterm which named
   - docker exec --tty ${container_id} env TERM=xterm /usr/bin/env named -v
 
-
   ## Tests Zone RR entries
   - printf ${blue}"Test DNS RR records."${neutral}
   # Ensure the configured RR entry is set
-  - "docker exec --tty ${container_id} env TERM=xterm dig +noall +answer NS test.local @localhost 1>&2 | grep localhost."
-  - "docker exec --tty ${container_id} env TERM=xterm dig +noall +answer A server1.test.local @localhost 1>&2 | grep 192.168.1.1"
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer NS test.local @localhost | ensureContains localhost.
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer A server1.test.local @localhost | ensureContains 192.168.1.1
 
 
   ## Tests SOA features
   - printf ${blue}"Test DNS RR SOA record features."${neutral}
   # TEST-SOA.1 Ensure the automaticcly generated SOA serial is valid
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' 1>&2 | grep "$(date '+%Y%m%d00')"
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' | ensureEquals "$(date '+%Y%m%d00')"
 
   # TEST-SOA.2 Ensure that manual set SOA is correctly respected
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $7 }' 1>&2 | grep --extended-regexp "^20101010$"
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $7 }' | ensureEquals '20101010'
 
   # TEST-SOA.3 Ensure that email address is correctly encoded
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $6 }' 1>&2 |  grep --extended-regexp "^admin\.example\.com.$"
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA manual-soa-test.local | awk '{ print $6 }' |  ensureEquals 'admin.example.com.'
 
   # TEST-SOA.4 Ensure that SOA serial is correctly updated on zone change (test SOA.4)
   - "sed -i 's/# TEST-SOA.4/      - { name: '\''server2'\'',  type: '\''A'\'', data: '\''192.168.1.1'\'' }/' tests/group_vars/all.yml"
   - test_run_playbook
-  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' 1>&2 | grep "$(date '+%Y%m%d01')"
+  - docker exec --tty ${container_id} env TERM=xterm dig +noall +answer SOA test.local | awk '{ print $7 }' | ensureEquals "$(date '+%Y%m%d01')"
