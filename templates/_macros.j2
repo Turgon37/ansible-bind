@@ -54,7 +54,7 @@ zone "{{ name }}" {{ config.class | d('IN') }} {
 {%   endif %}
 {% else %}
   file "{{ config.file }}";
-{% endif %}  
+{% endif %}
 {% if config.allow_update is defined %}
   allow-update { {{ listify(config.allow_update) }} };
 {% endif %}
