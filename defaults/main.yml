@@ -144,15 +144,18 @@ bind__zones: '{{ bind__default_zones
                      | combine(bind__group_zones)
                      | combine(bind__host_zones) }}'
 
+#
 bind__zones_default_ttl: 604800
 
+# Defaults values for some DNS entries
 bind__zones_entry_default:
   SOA:
     data:
-      serial: "{{ ansible_date_time.year + ansible_date_time.month + ansible_date_time.day + '00' }}"
-      refresh: 604800
-      retry: 86400
-      expiry: 2419200
+      email:     '{{ bind__empty_contact }}'
+      serial:   "{{ ansible_date_time.year~ansible_date_time.month~ansible_date_time.day~'00' }}"
+      refresh:  604800
+      retry:    86400
+      expiry:   2419200
       negative: 604800
 
 # List of allowed RR class

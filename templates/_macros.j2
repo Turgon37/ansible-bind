@@ -74,9 +74,13 @@ zone "{{ name }}" {{ config.class | d('IN') }} {
  #     spec.class : OPTIONAL the class of the entry
  #     spec.type : the type of the entry
  #     spec.data : depends on the value of type
- #           'SOA': data.ns   the name of the main name server
-                    data.mail   the administrator email
-                    
+ #           'SOA': data.ns        the name of the main name server
+                    data.email     the administrator email
+                    data.serial    the zone serial
+                    data.refresh   refresh time for slave
+                    data.retry     time between slave retry attempts
+                    data.expiry    expiry time considered by slave for this zone
+                    data.negative  minimum time/default ttl
  #          -other-: OPTIONAL
  #
  # @return the RR entry
@@ -88,7 +92,7 @@ zone "{{ name }}" {{ config.class | d('IN') }} {
 {% set type = spec.type %}
 {% if type == 'SOA' %}
 {%   set data = [spec.data.ns,
-                  fqdn( emailify(spec.data.mail) ),
+                  fqdn( emailify(spec.data.email) ),
                   '(\n',
                     ' ' * 80, spec.data.serial, ' ; Serial \n',
                     ' ' * 80, spec.data.refresh, ' ; Refresh \n',
@@ -99,5 +103,5 @@ zone "{{ name }}" {{ config.class | d('IN') }} {
 {% else %}
 {%   set data = spec.data | d('') %}
 {% endif %}
-{{ name }}{{ ' ' * ((30 - name | length) | abs) }} {{ ttl }}{{ ' ' * ((10 - class | length) | abs) }} {{ class }}{{ ' ' * ((10 - class | length) | abs) }} {{ type }}{{ ' ' * ((20 - type | length) | abs) }} {{ data }}
+{{ name }}{{ ' ' * ((30 - name | length) | abs) }} {{ ttl }}{{ ' ' * ((10 - class | length) | abs) }} {{ class }}{{ ' ' * ((10 - class | length) | abs) }} {{ type }}{{ ' ' * ((20 - type | length) | abs) }} {{ data }}{% if spec.comment is defined %} ; {{ spec.comment }}{% endif %}
 {%- endmacro -%}
