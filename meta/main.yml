@@ -8,6 +8,10 @@ galaxy_info:
       versions:
         - 9
         - 8
+    - name: Raspbian
+      versions:
+        - 9
+        - 8
     - name: CentOS
       versions:
         - 7
