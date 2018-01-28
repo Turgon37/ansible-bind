@@ -13,11 +13,11 @@
 
 - name: Download list of root server
   get_url:
-    url: '{{ bind__root_server_source }}'
-    dest: '{{ bind__root_server_hint_file }}'
-    mode: 0644
-    backup: yes
-    force: yes
+    url:      '{{ bind__root_server_source }}'
+    dest:     '{{ bind__root_server_hint_file }}'
+    mode:     0644
+    backup:   yes
+    force:    yes
     checksum: '{{ bind__root_server_source_checksum|d(omit) }}'
   ignore_errors: '{{ bind__root_server_source_ignore|bool }}'
   notify: [ 'reload-bind' ]
