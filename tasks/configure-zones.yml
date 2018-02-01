@@ -19,7 +19,7 @@
     backup:   yes
     force:    yes
     checksum: '{{ bind__root_server_source_checksum|d(omit) }}'
-  ignore_errors: '{{ bind__root_server_source_ignore|bool }}'
+  ignore_errors: '{{ bind__root_server_source_ignore_errors|bool }}'
   notify: [ 'reload-bind' ]
 
 - name: Get current zones serial
