@@ -5,8 +5,10 @@
   service:
     name: '{{ bind__service_name }}'
     state: restarted
+  when: bind__service_enabled|bool
 
 - name: reload-bind
   service:
     name: '{{ bind__service_name }}'
     state: reloaded
+  when: bind__service_enabled|bool
