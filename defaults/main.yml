@@ -73,7 +73,7 @@ bind__root_server_hint_file: '{{ bind__config_dir }}/db.root'
 
 # the url from which to retrieve the root names servers list
 bind__root_server_source: 'https://www.internic.net/domain/named.cache'
-bind__root_server_source_checksum: 'sha256:75bd2bb30208071a04896ebca755c6ed0e2889bf7df6b48bae6c17769a60df84'
+bind__root_server_source_checksum: 'sha256:a46276bb570d160f6fe18b8a21a911cac2f34b13f694a5117ea1f646fad8fecb'
 # Don't produce fail state if the checksum mismatch
 bind__root_server_source_ignore_errors: False
 
