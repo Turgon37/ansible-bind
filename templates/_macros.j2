@@ -6,7 +6,7 @@
  # @return string
  #}
 {%- macro listify(parameter) -%}
-{{ parameter if parameter is string else parameter | join('; ') }};
+{{ parameter if parameter is string else parameter|join('; ') }};
 {%- endmacro -%}
 
 
@@ -28,7 +28,7 @@
  # @return the fqdnified email
  #}
 {%- macro fqdn(domain) -%}
-{{ domain if domain[domain | length -1] == '.' else domain + '.' }}
+{{ domain if domain[domain|length -1] == '.' else domain + '.' }}
 {%- endmacro -%}
 
 
@@ -48,9 +48,9 @@ zone "{{ name }}" {{ config.class | d('IN') }} {
   type {{ config.type }};
 {% if config.file == 'auto' %}
 {%   if config.type in ['master'] %}
-  file "{{ bind__static_zones_dir }}/db.{{ name | replace(' ', '') }}";
+  file "{{ bind__static_zones_dir }}/db.{{ name|replace(' ', '') }}";
 {%   else %}
-  file "{{ bind__dynamic_zones_dir }}/db.{{ name | replace(' ', '') }}";
+  file "{{ bind__dynamic_zones_dir }}/db.{{ name|replace(' ', '') }}";
 {%   endif %}
 {% else %}
   file "{{ config.file }}";
@@ -86,10 +86,10 @@ zone "{{ name }}" {{ config.class | d('IN') }} {
  # @return the RR entry
  #}
 {%- macro rr(spec) -%}
-{% set name = spec.name | d('') %}
-{% set ttl = spec.ttl | d('') %}
-{% set class = spec.class | d('IN') %}
-{% set type = spec.type %}
+{% set name  = spec.name|d('') %}
+{% set ttl   = spec.ttl|d('') %}
+{% set class = spec.class|d('IN') %}
+{% set type  = spec.type %}
 {% if type == 'SOA' %}
 {%   set data = [spec.data.ns,
                   fqdn( emailify(spec.data.email) ),
@@ -103,5 +103,5 @@ zone "{{ name }}" {{ config.class | d('IN') }} {
 {% else %}
 {%   set data = spec.data | d('') %}
 {% endif %}
-{{ name }}{{ ' ' * ((30 - name | length) | abs) }} {{ ttl }}{{ ' ' * ((10 - class | length) | abs) }} {{ class }}{{ ' ' * ((10 - class | length) | abs) }} {{ type }}{{ ' ' * ((20 - type | length) | abs) }} {{ data }}{% if spec.comment is defined %} ; {{ spec.comment }}{% endif %}
+{{ name }}{{ ' ' * ( abs(30 - name|length) ) }} {{ ttl }}{{ ' ' * ( abs(10 - class|length) ) }} {{ class }}{{ ' ' * ( abs(10 - class|length) ) }} {{ type }}{{ ' ' * ( abs(20 - type|length) ) }} {{ data }}{% if spec.comment is defined %} ; {{ spec.comment }}{% endif %}
 {%- endmacro -%}
