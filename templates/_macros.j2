@@ -99,9 +99,9 @@ zone "{{ name }}" {{ config.class | d('IN') }} {
                     ' ' * 80, spec.data.retry, ' ; Retry \n',
                     ' ' * 80, spec.data.expiry, ' ; Expire \n',
                     ' ' * 80, spec.data.negative, ' ; Negative Cache TTL \n',
-                  ' ' * 80, ')'] | join(' ') %}
+                    ' ' * 80, ')'] | join(' ') %}
 {% else %}
 {%   set data = spec.data | d('') %}
 {% endif %}
-{{ name }}{{ ' ' * ( abs(30 - name|length) ) }} {{ ttl }}{{ ' ' * ( abs(10 - class|length) ) }} {{ class }}{{ ' ' * ( abs(10 - class|length) ) }} {{ type }}{{ ' ' * ( abs(20 - type|length) ) }} {{ data }}{% if spec.comment is defined %} ; {{ spec.comment }}{% endif %}
+{{ name }}                 {{ ttl }}      {{ class }}     {{ type }}   {{ data }} {% if spec.comment is defined %} ; {{ spec.comment }}{% endif %}
 {%- endmacro -%}
