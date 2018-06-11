@@ -48,9 +48,9 @@ zone "{{ name }}" {{ config.class | d('IN') }} {
   type {{ config.type }};
 {% if config.file == 'auto' %}
 {%   if config.type in ['master'] %}
-  file "{{ bind__static_zones_dir }}/db.{{ name|replace(' ', '') }}";
+  file "{{ bind__static_zones_directory }}/db.{{ name|replace(' ', '') }}";
 {%   else %}
-  file "{{ bind__dynamic_zones_dir }}/db.{{ name|replace(' ', '') }}";
+  file "{{ bind__dynamic_zone_directory }}/db.{{ name|replace(' ', '') }}";
 {%   endif %}
 {% else %}
   file "{{ config.file }}";

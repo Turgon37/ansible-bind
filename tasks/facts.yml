@@ -2,14 +2,16 @@
 
 - name: Create custom fact directory
   file:
-    path:  "{{ facts__dir|d('/etc/ansible/facts.d') }}"
+    path: "{{ facts__dir|d('/etc/ansible/facts.d') }}"
     owner: root
     group: root
-    mode:  0755
+    mode: 0755
     state: directory
+  tags: ['bind', 'bind-facts']
 
 - name: Insert custom fact file
   copy:
-    src:  files/bind.py
+    src: files/bind.fact.py
     dest: "{{ facts__dir|d('/etc/ansible/facts.d') }}/bind.fact"
     mode: 0755
+  tags: ['bind', 'bind-facts']

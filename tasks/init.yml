@@ -10,29 +10,34 @@
       - bind__allow_query_on is string or bind__allow_query_on is iterable
       - bind__blackhole is string or bind__blackhole is iterable
       - bind__allow_recursion is string or bind__allow_recursion is iterable
-      - bind__allow_recursion_on is string or bind__allow_recursion_on is iterable
+      - bind__allow_recursion_on is string
+        or bind__allow_recursion_on is iterable
       - bind__forward in ['first', 'only']
 
 - name: Assert zones configuration
   assert:
     that:
-      - item.value.type is defined and item.value.type in ['hint', 'master', 'slave']
-      - item.value.class is not defined or item.value.class is defined and item.value.class in ['IN']
+      - item.value.type is defined
+        and item.value.type in ['hint', 'master', 'slave']
+      - item.value.class is not defined
+        or item.value.class is defined and item.value.class in ['IN']
   with_dict: '{{ bind__zones }}'
 
 - name: Assert zones entries configuration
   assert:
     that:
       - item.1.type is defined and item.1.type in bind__allowed_rr_types
-      - item.1.class is not defined or item.1.class is defined and item.1.class in bind__allowed_rr_class
+      - item.1.class is not defined
+        or item.1.class is defined and item.1.class in bind__allowed_rr_class
       - not (item.1.type in ['AAAA', 'A', 'NS'] and item.1.data is not string)
   with_subelements:
-    - "{{ bind__zones }}"
-    - "entries"
-    - skip_missing: yes
+    - '{{ bind__zones }}'
+    - entries
+    - skip_missing: true
 
 - name: Check if all files zones have at least one NS record
   fail:
     msg: "The {{ item.value.type }} zone has not any NS entry"
   with_dict: '{{ bind__zones }}'
-  when: item.value.type in ['master'] and 'NS' not in (item.value.entries | map(attribute='type') | list)
+  when: item.value.type in ['master']
+    and 'NS' not in (item.value.entries|map(attribute='type')|list)

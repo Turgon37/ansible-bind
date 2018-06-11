@@ -10,11 +10,11 @@ include "{{ bind__config_acls }}";
 {% endif %}
 
 // Load internal options
-include "{{ bind__config_dir }}/named.conf.options";
+include "{{ bind__config_directory }}/named.conf.options";
 
 // Load zones
-include "{{ bind__config_dir }}/named.conf.zones";
+include "{{ bind__config_directory }}/named.conf.zones";
 
 
-#include "{{ bind__config_dir }}/named.conf.local";
-#include "{{ bind__config_dir }}/named.conf.default-zones";
+#include "{{ bind__config_directory }}/named.conf.local";
+#include "{{ bind__config_directory }}/named.conf.default-zones";
