@@ -20,9 +20,10 @@ def test_rrentry(host):
 
 
 def test_manual_soa(host):
+    soa = host.check_output('dig +noall +answer SOA manual-soa-test.local ' +
+                            ' @localhost')
+    soa_parts = soa.split()
     # Ensure that manual set SOA is correctly respected
-    assert ('20101010' in
-            host.check_output(
-                "dig +noall +answer SOA manual-soa-test.local " +
-                "@localhost | awk '{ print $7 }'")
-            )
+    assert '20101010' in soa_parts[6]
+    # Ensure that email address is correctly encoded
+    assert 'admin.example.com.' in soa_parts[5]
