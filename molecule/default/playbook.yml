@@ -11,7 +11,7 @@
         type: master
         file: auto
         entries:
-          - name: @
+          - name: '@'
             type: NS
             data: localhost.
           - name: server1
