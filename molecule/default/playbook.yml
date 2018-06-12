@@ -5,7 +5,6 @@
   roles:
     - role: ansible-bind
   vars:
-    bind__allow_recursion: '{{ bind__allow_query }}'
     bind__global_zones:
       test.local:
         type: master
