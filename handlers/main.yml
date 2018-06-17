@@ -2,13 +2,23 @@
 # handlers file for bind
 
 - name: restart-bind
+  command: '{{ bind__checkconf_program }} {{ bind__config_file }}'
+  notify: ['restart-bind-after-config-ok']
+
+- name: reload-bind
+  command: '{{ bind__checkconf_program }} {{ bind__config_file }}'
+  notify: ['reload-bind-after-config-ok']
+
+- name: restart-bind-daemon
   service:
     name: '{{ bind__service_name }}'
     state: restarted
   when: bind__service_enabled|bool
+  listen: restart-bind-after-config-ok
 
-- name: reload-bind
+- name: reload-bind-daemon
   service:
     name: '{{ bind__service_name }}'
     state: reloaded
   when: bind__service_enabled|bool
+  listen: reload-bind-after-config-ok

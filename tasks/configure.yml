@@ -56,7 +56,7 @@
 
 - name: Ensure temporary data directory exists
   file:
-    path: "{{ bind__var_data_dir }}"
+    path: "{{ bind__var_data_directory }}"
     owner: "{{ bind__service_user }}"
     group: "{{ bind__service_group }}"
     mode: 0770

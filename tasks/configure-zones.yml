@@ -16,5 +16,4 @@
     owner: root
     group: root
     mode: 0644
-    validate: "{{ bind__checkconf_program }} {{ bind__config_file }}"
   notify: ['restart-bind']
