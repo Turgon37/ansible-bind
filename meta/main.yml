@@ -8,7 +8,7 @@ galaxy_info:
       versions:
         - jessie
         - stretch
-    - name: CentOS
+    - name: EL
       versions:
         - 7
   galaxy_tags: []
