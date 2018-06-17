@@ -11,8 +11,8 @@ Wants=named-setup-rndc.service
 {% if bind__service_environment is defined %}
 EnvironmentFile=-{{ bind__service_environment }}
 {% endif %}
-RuntimeDirectory={{ bind__pid_file|basename }}
 PIDFile={{ bind__pid_file }}
+ExecStartPre=/usr/bin/env install --directory {{ bind__service_run_directory }} --owner {{ bind__service_user }} --group {{ bind__service_group }} --mode 755
 ExecStart={{ bind__service_executable }} -f -u {{ bind__service_user }} -c {{ bind__config_file }} $OPTIONS
 ExecReload=/usr/sbin/rndc reload
 ExecStop=/usr/sbin/rndc stop

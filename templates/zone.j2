@@ -3,9 +3,9 @@
 ; {{ ansible_managed }}
 ;
 
-; This file contains the zone declarations for zone {{ item.key }}
-{% set zone = item.value %}
-{% set domain = item.key %}
+; This file contains the zone declarations for zone {{ bind__zone.name }}
+{% set zone = bind__zone %}
+{% set domain = bind__zone.name %}
 {% set first_soa = [] %}
 {% set first_ns = [] %}
 {% for entry in zone.entries|d([]) %}

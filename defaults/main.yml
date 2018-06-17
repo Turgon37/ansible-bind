@@ -62,8 +62,10 @@ bind__keys_directory: '{{ bind__config_directory }}/keys'
 # that track managed DNSSEC keys
 bind__managed_keys_directory: '{{ bind__var_directory }}/dnssec-keys'
 
-
+# Program tool to use to check bind configuration syntax
 bind__checkconf_program: named-checkconf
+
+# Program tool to use to check zone configuration syntax
 bind__checkzone_program: named-checkzone
 
 
@@ -86,7 +88,7 @@ bind__session_keyfile: '{{ bind__service_run_directory }}/session.key'
 
 # Configure ACLs
 # each one must have {name: 'friendly name', 'match': ['any', '0.0.0.0/24']}
-bind__config_acls: "{{ bind__config_directory }}/named.conf.acls"
+bind__config_acls: '{{ bind__config_directory }}/named.conf.acls'
 bind__acls: []
 
 # Default location for rndc management key
@@ -121,36 +123,36 @@ bind__forward: first
 bind__forwarders: []
 
 # Path to zones directory
-bind__static_zones_directory: '{{ bind__config_directory }}/zones'
-bind__dynamic_zone_directory: '{{ bind__config_directory }}/dynamic-zones'
-bind__root_server_hint_file: '{{ bind__config_directory }}/db.root'
-
-# the url from which to retrieve the root names servers list
-bind__root_server_source: 'https://www.internic.net/domain/named.cache'
-bind__root_server_source_checksum:
-  'sha256:f87fb9ae71625ee0850bc107a1959cb41f838302ae30a3be1a2c3d7ad65e56e7'
-# Don't produce fail state if the checksum mismatch
-bind__root_server_source_ignore_errors: false
+bind__zones_directory: '{{ bind__config_directory }}/zones'
+# Default location of static zones
+bind__static_zones_directory: '{{ bind__zones_directory }}/static'
+# Default location of dynamic zones
+bind__dynamic_zones_directory: '{{ bind__zones_directory }}/dynamic'
 
 # List of default zones
 bind__default_zones:
   '.':
-    type: 'hint'
-    file: '{{ bind__root_server_hint_file }}'
-  'localhost.localdomain':
-    type: 'master'
-    file: 'auto'
+    type: hint
+    file: db.root
+    source_url: https://www.internic.net/domain/named.cache
+    # the url from which to retrieve the root names servers list
+    source_checksum: 'sha256:f87fb9ae71625ee0850bc107a1959cb41f838302ae30a3be1a2c3d7ad65e56e7'
+    # Don't produce fail state if the checksum mismatch
+    source_ignore_errors: false
+  localhost.localdomain:
+    type: master
+    file: auto
     allow_update: 'none'
     entries:
       - name: '@'
-        type: 'NS'
+        type: NS
         data: 'localhost.'
       - name: '1.0.0'
-        type: 'PTR'
+        type: PTR
         data: 'localhost.'
-  'localhost':
-    type: 'master'
-    file: 'auto'
+  localhost:
+    type: master
+    file: auto
     entries:
       - name: '@'
         type: 'NS'
@@ -162,28 +164,28 @@ bind__default_zones:
         type: 'AAAA'
         data: '::1'
   '127.in-addr.arpa':
-    type: 'master'
-    file: 'auto'
+    type: master
+    file: auto
     entries:
       - name: '@'
-        type: 'NS'
+        type: NS
         data: 'localhost.'
       - name: '1.0.0'
-        type: 'PTR'
+        type: PTR
         data: 'localhost.'
   '0.in-addr.arpa':
-    type: 'master'
-    file: 'auto'
+    type: master
+    file: auto
     entries:
       - name: '@'
-        type: 'NS'
+        type: NS
         data: 'localhost.'
   '255.in-addr.arpa':
     type: 'master'
-    file: 'auto'
+    file: auto
     entries:
       - name: '@'
-        type: 'NS'
+        type: NS
         data: 'localhost.'
 
 # This variable is intended to be used in Ansible’s global inventory.

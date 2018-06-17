@@ -2,8 +2,6 @@
 // {{ ansible_managed }}
 //
 
-// This is the primary configuration file for the BIND DNS server named.
-
 {% if bind__acls | length > 0 %}
 // Define ACL
 include "{{ bind__config_acls }}";

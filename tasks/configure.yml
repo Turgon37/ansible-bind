@@ -29,7 +29,7 @@
     state: absent
   with_items: '{{ bind__remove_distribution_files }}'
 
-- name: Ensure bind configuration directories exists
+- name: Ensure bind read only configurations directories exists
   file:
     path: '{{ item }}'
     owner: root
@@ -38,11 +38,12 @@
     state: directory
   with_items:
     - '{{ bind__config_directory }}'
+    - '{{ bind__zones_directory }}'
     - '{{ bind__static_zones_directory }}'
     - '{{ bind__keys_directory }}'
     - '{{ bind__var_directory }}'
 
-- name: Ensure bind dynamic zones configuration directory exist
+- name: Ensure bind read and write configurations directories exists
   file:
     path: '{{ item }}'
     owner: '{{ bind__service_user }}'
@@ -50,7 +51,7 @@
     mode: 0770
     state: directory
   with_items:
-    - '{{ bind__dynamic_zone_directory }}'
+    - '{{ bind__dynamic_zones_directory }}'
     - '{{ bind__managed_keys_directory }}'
 
 - name: Ensure temporary data directory exists
