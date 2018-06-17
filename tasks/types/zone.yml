@@ -48,7 +48,7 @@
 - name: Register zone serial
   set_fact:
     _bind__zone_serial:
-        "{{ _bind__zone_serial_raw.stdout|regex_search('[0-9]+') }}"
+      "{{ _bind__zone_serial_raw.stdout|regex_search('[0-9]+') }}"
   when: _bind__zone_stat.stat.exists
     and bind__zone.type in ['master']
     and _bind__zone_serial_raw is success
@@ -94,7 +94,7 @@
       "{{  _bind__zone_serial[:-2]~
             ( '%02d'|format( _bind__zone_serial[-2:]|int + 1) )
             if _bind__zone_serial[:-2]
-                is match(bind__zones_entry_default['SOA']['data']['serial'][:-2])
+              is match(bind__zones_entry_default['SOA']['data']['serial'][:-2])
             else bind__zones_entry_default['SOA']['data']['serial'] }}"
   when: _bind__master_zone_template is changed and _bind__zone_serial|length
   notify: ['reload-bind']

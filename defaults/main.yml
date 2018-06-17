@@ -136,7 +136,8 @@ bind__default_zones:
     file: db.root
     source_url: https://www.internic.net/domain/named.cache
     # the url from which to retrieve the root names servers list
-    source_checksum: 'sha256:f87fb9ae71625ee0850bc107a1959cb41f838302ae30a3be1a2c3d7ad65e56e7'
+    source_checksum:
+      'sha256:f87fb9ae71625ee0850bc107a1959cb41f838302ae30a3be1a2c3d7ad65e56e7'
     # Don't produce fail state if the checksum mismatch
     source_ignore_errors: false
   localhost.localdomain:
