@@ -5,34 +5,37 @@ Ansible Role Bind DNS server
 
 :warning: This role is under development, some important (and possibly breaking) changes may happend. Don't use it in production level environments but you can eventually base your own role on this one :hammer:
 
+## Description
+
 :grey_exclamation: Before using this role, please know that all my Ansible roles are fully written and accustomed to my IT infrastructure. So, even if they are as generic as possible they will not necessarily fill your needs, I advice you to carrefully analyse what they do and evaluate their capability to be installed securely on your servers.
 
-**This roles configure the bind dns server.**
-
-## Features
-
-Currently this role provide the following features :
-
-  * bind9 installation
-  * base configuration
-  * static zones definitions (with automatic SOA entries and zone's serials numbers computation)
-  * slaves zones declarations
-  * root server list update handled by ansible
-  * [local facts](#facts)
+This roles configure the bind dns server.
 
 ## Requirements
 
-### OS Family
+Require Ansible >= 2.4
+
+### Dependencies
+
+## OS Family
 
 This role is available for
 
   * CentOS 7
-  * Debian/Raspbian 8/9
+  * Debian 8/9
 
-### Dependencies
+## Features
 
+At this day the role can be used to :
 
-## Role Variables
+  * install bind9
+  * perform basic configuration
+  * define static zones (with automatic SOA entries and zone's serials numbers computation)
+  * define slaves zones
+  * install updated root server list
+  * [local facts](#facts)
+
+## Configuration
 
 The variables that can be passed to this role and a brief description about them are as follows:
 
@@ -177,39 +180,39 @@ By default the local fact are installed and expose the following variables :
 * ```ansible_local.bind.version_full```
 * ```ansible_local.bind.version_major```
 
+## Example
 
-## Example Playbook
+### Playbook
+
+Use it in a playbook as follows:
+
+```yaml
+- hosts: all
+  roles:
+    - turgon37.bind
+```
+
+### Inventory
 
 To use this role create or update your playbook according the following example :
 
-
 ```
-    - hosts: servers
-      roles:
-         - bind9
-      vars:
-        bind__allow_query:
-          - '192.168.1.0/24'
-          - 'localhost'
-        bind__listen_on:
-          - 192.168.1.10
-          - 127.0.0.1
-        bind__allow_recursion: '192.168.1.0/24'
-        bind__empty_contact: 'admin@example.com'
-        bind__global_zones:
-          'test.example.local':
-            type: 'master'
-            file: 'auto'
-            entries:
-              - { name: '@',                 type: 'NS',     data: 'dns1.example.com.' }
-              - { name: 'dns1.example.com.', type: 'A',      data: '192.168.1.10'      }
-              - { name: 'srvp1-kari',        type: 'A',      data: '192.168.57.210'    }
-              - { name: 'srvv1-hyperion',    type: 'A',      data: '192.168.57.211'    }
-              - { name: 'ipa',               type: 'CNAME',  data: 'srvv1-hyperion'    }
-              - { name: 'storage',           type: 'CNAME',  data: 'srvp1-atlas'       }
+bind__allow_query:
+  - '192.168.1.0/24'
+  - 'localhost'
+bind__listen_on:
+  - 192.168.1.10
+  - 127.0.0.1
+bind__allow_recursion: '192.168.1.0/24'
+bind__empty_contact: 'admin@example.com'
+bind__global_zones:
+  'test.example.local':
+    type: 'master'
+    file: 'auto'
+    entries:
+      - { name: '@',                 type: 'NS',     data: 'dns1.example.com.' }
+      - { name: 'dns1.example.com.', type: 'A',      data: '192.168.1.10'      }
+      - { name: 'srv1',              type: 'A',      data: '192.168.1.210'    }
+      - { name: 'srv2',              type: 'A',      data: '192.168.1.211'    }
+      - { name: 'storage',           type: 'CNAME',  data: 'srv1'       }
 ```
-
-
-## License
-
-MIT

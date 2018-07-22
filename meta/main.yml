@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: bind
   author: Pierre GINDRAUD
   description: This role install and configure the BIND DNS server
   license: MIT
