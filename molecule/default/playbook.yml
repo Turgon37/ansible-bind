@@ -1,0 +1,42 @@
+---
+- name: Run role
+  hosts: all
+  any_errors_fatal: true
+  roles:
+    - role: ansible-bind
+  vars:
+    bind__global_zones:
+      test.local:
+        type: master
+        file: auto
+        entries:
+          - name: '@'
+            type: NS
+            data: localhost.
+          - name: server1
+            type: A
+            data: 192.168.1.1
+          - name: www
+            type: CNAME
+            data: web-server
+
+      manual-soa-test.local:
+        type: master
+        file: auto
+        entries:
+          - name: '@'
+            type: SOA
+            data:
+              ns: server1
+              email: admin@example.com
+              serial: 20101010
+              refresh: 604800
+              retry: 86400
+              expiry: 2419200
+              negative: 604800
+          - name: '@'
+            type: NS
+            data: localhost.
+          - name: server1
+            type: A
+            data: 192.168.1.1

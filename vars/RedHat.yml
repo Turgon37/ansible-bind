@@ -1,22 +1,20 @@
 ---
 # vars file for bind (RedHat specific)
 
-bind__packages:
+bind__packages_names:
   - bind
   - bind-utils
 
+bind__remove_distribution_directories:
+  - /etc/named
+
+bind__remove_distribution_files:
+  - /etc/named.conf
+  - /etc/named.root.key
+
 bind__service_name: named
+bind__service_user: named
 
-bind__config_dir: /etc/named
+bind__service_environment: /etc/sysconfig/named
 
-bind__runas_user: named
-
-# Main config file
-bind__config: /etc/named.conf
-
-# Directory with run-time stuff
-bind__var_dir: /var/named
-
-bind__pid_file: /run/named/named.pid
-
-bind__rndc_keyfile: '/etc/rndc.key'
+bind__rndc_keyfile: /etc/rndc.key

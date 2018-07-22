@@ -17,7 +17,7 @@
  # @return string the email address emailified
  #}
 {%- macro emailify(email) -%}
-{{ email | replace('@', '.') }}
+{{ email|replace('@', '.') }}
 {%- endmacro -%}
 
 
@@ -28,7 +28,7 @@
  # @return the fqdnified email
  #}
 {%- macro fqdn(domain) -%}
-{{ domain if domain[domain|length -1] == '.' else domain + '.' }}
+{{ domain if domain[domain|length -1] == '.' else domain~'.' }}
 {%- endmacro -%}
 
 
@@ -44,16 +44,20 @@
  # @return the zone statement
  #}
 {%- macro zone(name, config) -%}
-zone "{{ name }}" {{ config.class | d('IN') }} {
+zone "{{ name }}" {{ config.class|d('IN') }} {
   type {{ config.type }};
 {% if config.file == 'auto' %}
 {%   if config.type in ['master'] %}
-  file "{{ bind__static_zones_dir }}/db.{{ name|replace(' ', '') }}";
+  file "{{ bind__static_zones_directory }}/db.{{ name }}";
 {%   else %}
-  file "{{ bind__dynamic_zones_dir }}/db.{{ name|replace(' ', '') }}";
+  file "{{ bind__dynamic_zones_directory }}/db.{{ name }}";
 {%   endif %}
 {% else %}
+{%   if config.file is match("^/") %}
   file "{{ config.file }}";
+{%   else %}
+  file "{{ bind__static_zones_directory}}/{{ config.file }}";
+{%   endif %}
 {% endif %}
 {% if config.allow_update is defined %}
   allow-update { {{ listify(config.allow_update) }} };

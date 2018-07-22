@@ -4,4 +4,4 @@
   package:
     name: '{{ item }}'
     state: present
-  with_items: '{{ bind__packages }}'
+  with_items: '{{ bind__packages_names }}'

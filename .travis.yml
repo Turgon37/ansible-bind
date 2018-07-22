@@ -1,54 +1,26 @@
 ---
-language: bash
-
+language: python
+cache: pip
 # Tell Travis to start Docker when it brings up an environment.
 services:
   - docker
-
 env:
-  # Provide a list of OSes we want to use for testing.
-  - DISTRIBUTION: debian8
-  - DISTRIBUTION: debian9
-  - DISTRIBUTION: centos7
+  - ANSIBLE='ansible>=2.4.0,<2.5.0'
+  - ANSIBLE='ansible>=2.5.1'
+matrix:
+  fast_finish: true
+
+install:
+  - >
+    pip install
+    ${ANSIBLE}
+    'ansible-lint>=3.4.15'
+    'molecule>=2.13.0'
+    docker
+    'testinfra>=1.7.0'
 
 script:
-  # Configure test script so we can run extra tests after playbook is run.
-  - export CLEANUP=false
+  - travis_wait 30 molecule test --all
 
-  # Download test shim.
-  - wget -O ${PWD}/tests/test.sh https://gist.githubusercontent.com/Turgon37/5b6e6553ef92dc65d1c7df3e1a1e290e/raw/
-  - chmod +x ${PWD}/tests/test.sh
-
-  # Run tests.
-  - source ${PWD}/tests/test.sh
-  - export container_id=$(cat /tmp/container_id)
-
-  #
-  ## Specific roles tests
-  #
-  # Ensure Bind is installed.
-  - docker exec --tty --env TERM=xterm ${container_id} which named
-  - docker exec --tty --env TERM=xterm ${container_id} /usr/bin/env named -v
-
-  ## Tests Zone RR entries
-  - printf ${blue}"Test DNS RR records."${neutral}
-  # Ensure the configured RR entry is set
-  - docker exec --tty --env TERM=xterm ${container_id} dig +noall +answer NS test.local @localhost | ensureContains localhost.
-  - docker exec --tty --env TERM=xterm ${container_id} dig +noall +answer A server1.test.local @localhost | ensureContains 192.168.1.1
-  - docker exec --tty --env TERM=xterm ${container_id} dig +noall +answer CNAME www.test.local @localhost | ensureContains web-server
-
-  ## Tests SOA features
-  - printf ${blue}"Test DNS RR SOA record features."${neutral}
-  # TEST-SOA.1 Ensure the automatically generated SOA serial is valid
-  - docker exec --tty --env TERM=xterm ${container_id} dig +noall +answer SOA test.local @localhost | awk '{ print $7 }' | ensureEquals "$(date '+%Y%m%d00')"
-
-  # TEST-SOA.2 Ensure that manual set SOA is correctly respected
-  - docker exec --tty --env TERM=xterm ${container_id} dig +noall +answer SOA manual-soa-test.local @localhost | awk '{ print $7 }' | ensureEquals '20101010'
-
-  # TEST-SOA.3 Ensure that email address is correctly encoded
-  - docker exec --tty --env TERM=xterm ${container_id} dig +noall +answer SOA manual-soa-test.local @localhost | awk '{ print $6 }' |  ensureEquals 'admin.example.com.'
-
-  # TEST-SOA.4 Ensure that SOA serial is correctly updated on zone change (test SOA.4)
-  - "sed -i 's/# TEST-SOA.4/      - { name: '\''server2'\'',  type: '\''A'\'', data: '\''192.168.1.1'\'' }/' tests/group_vars/all.yml"
-  - test_run_playbook
-  - docker exec --tty --env TERM=xterm ${container_id} dig +noall +answer SOA test.local @localhost | awk '{ print $7 }' | ensureEquals "$(date '+%Y%m%d01')"
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

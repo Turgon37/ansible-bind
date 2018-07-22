@@ -3,39 +3,41 @@
 - name: Install named.conf
   template:
     src: named.conf.j2
-    dest: "{{ bind__config }}"
+    dest: '{{ bind__config_file }}'
     owner: root
     group: root
     mode: 0644
-    #validate: "{{ bind__checkconf_program }} %s"
-  notify: [ 'restart-bind' ]
+    # validate: "{{ bind__checkconf_program }} %s"
+  notify: ['restart-bind']
 
 ###### ACL
+
 - name: Install named.conf.acls
   template:
     src: named.conf.acls.j2
-    dest: "{{ bind__config_acls }}"
+    dest: '{{ bind__config_acls }}'
     owner: root
     group: root
     mode: 0644
-    #validate: "{{ bind__checkconf_program }} {{ bind__config }}"
-  when: bind__acls | length > 0
-  notify: [ 'restart-bind' ]
+    # validate: "{{ bind__checkconf_program }} {{ bind__config_file }}"
+  when: bind__acls|length > 0
+  notify: ['restart-bind']
 
 - name: Uninstall named.conf.acls
   file:
-    path: "{{ bind__config_acls }}"
+    path: '{{ bind__config_acls }}'
     state: absent
-  when: bind__acls | length == 0
-  notify: [ 'restart-bind' ]
+  when: bind__acls|length == 0
+  notify: ['restart-bind']
 
 ### OPTIONS
+
 - name: Install named.conf.options
   template:
     src: named.conf.options.j2
-    dest: "{{ bind__config_dir }}/named.conf.options"
+    dest: '{{ bind__config_directory }}/named.conf.options'
     owner: root
     group: root
     mode: 0644
-    #validate: "{{ bind__checkconf_program }} {{ bind__config }}"
-  notify: [ 'restart-bind' ]
+    # validate: "{{ bind__checkconf_program }} {{ bind__config_file }}"
+  notify: ['restart-bind']

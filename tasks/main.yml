@@ -2,27 +2,33 @@
 # tasks file for bind
 
 - name: Include the OS specific variables
-  include_vars: "{{ item }}"
+  include_vars: '{{ item }}'
   with_first_found:
     - files:
-        - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
-        - "{{ ansible_distribution }}.yml"
-        - "{{ ansible_os_family }}.yml"
-        - "defaults.yml"
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - defaults.yml
       skip: true
   tags: ['always']
 
-- import_tasks: init.yml
+- name: Import init tasks
+  import_tasks: init.yml
   tags: ['always']
 
-- import_tasks: install.yml
+- name: Import install tasks
+  import_tasks: install.yml
   tags: ['bind', 'bind-install']
 
-- import_tasks: configure.yml
+- name: Import configuration tasks
+  import_tasks: configure.yml
   tags: ['bind', 'bind-configure']
 
-- import_tasks: service.yml
+- name: Import service tasks
+  import_tasks: service.yml
   tags: ['bind', 'bind-service']
 
-- include_tasks: facts.yml
+- name: Optionally include facts tasks
+  include_tasks: facts.yml
   when: bind__facts|bool
+  tags: ['bind', 'bind-facts']

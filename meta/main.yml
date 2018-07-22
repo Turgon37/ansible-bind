@@ -1,18 +1,15 @@
 galaxy_info:
+  role_name: bind
   author: Pierre GINDRAUD
-  description: This role configure the BIND dns server
+  description: This role install and configure the BIND DNS server
   license: MIT
   min_ansible_version: 2.4
   platforms:
     - name: Debian
       versions:
-        - 9
-        - 8
-    - name: Raspbian
-      versions:
-        - 9
-        - 8
-    - name: CentOS
+        - jessie
+        - stretch
+    - name: EL
       versions:
         - 7
   galaxy_tags: []

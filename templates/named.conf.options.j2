@@ -5,24 +5,20 @@
 
 options {
     ////// MAIN CONFIGURATION
-
-    // Setting working directory
-    directory "{{ bind__var_dir }}";
-    // Daemon pid file
+    directory "{{ bind__var_directory }}";
     pid-file "{{ bind__pid_file }}";
-    // Where the public and private key for dynamic update
-    //key-directory "";
+    dump-file "{{ bind__dump_file }}";
+    memstatistics-file "{{ bind__memstatistics_file }}";
+    statistics-file "{{ bind__statistics_file }}";
+    managed-keys-directory "{{ bind__managed_keys_directory }}";
+    key-directory "{{ bind__keys_directory }}";
+    session-keyfile "{{ bind__session_keyfile }}";
 
     // Maximum memory amount to use for cache
     //max-cache-size 32M;
 
     //// Statistic options
-    // File to dump the database
-    dump-file "{{ bind__var_data_dir }}/cache_dump.db";
-    // File to write the memory stats on close
-    memstatistics-file "{{ bind__var_data_dir }}/bind_mem_stats.txt";
-    // The file in which the server append statistics when using rdnc stats
-    statistics-file "{{ bind__var_data_dir }}/bind_stats.txt";
+
     // Enables the collection of statistics on areas
     //zone-statistics yes;
 
@@ -105,7 +101,7 @@ options {
 
 
 
-	////// TRANSFER ZONE CONFIGURATION      
+	////// TRANSFER ZONE CONFIGURATION
 	//// Authorization
 	// List of IP address of server that are allowed to copy (transfer) the zone's informations from this server
 	//allow-transfer { none; };

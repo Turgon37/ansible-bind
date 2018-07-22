@@ -1,7 +1,33 @@
 ---
 
+- name: Install bind.service systemd unit file
+  template:
+    src: bind.service.j2
+    dest: '/etc/systemd/system/{{ bind__service_name }}.service'
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_service_mgr == 'systemd'
+  register: _bind__service
+  notify: ['restart-bind']
+
+- name: Remove sysvinit unit file
+  file:
+    path: '{{ bind__service_sysvinit_script }}'
+    state: absent
+  when: ansible_service_mgr == 'systemd'
+    and bind__service_sysvinit_script is defined
+  register: _bind__sysvinit
+  notify: ['restart-bind']
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: true
+  when: ansible_service_mgr == 'systemd'
+    and ( _bind__service is changed or _bind__sysvinit is changed )
+
 - name: Ensure bind is started and enabled on boot
   service:
-    name:    '{{ bind__service_name }}'
+    name: '{{ bind__service_name }}'
     enabled: '{{ bind__service_enabled|bool }}'
-    state:   "{{ bind__service_enabled|bool|ternary('started', 'stopped') }}"
+    state: "{{ bind__service_enabled|bool|ternary('started', 'stopped') }}"
