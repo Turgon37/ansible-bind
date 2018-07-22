@@ -10,10 +10,9 @@ bind__facts: true
 # List of packages to install
 bind__packages_names: []
 
-# List of distribution specific directories that will
-# be removed
+# List of distribution specific directories and files that will
+# be removed to clean the working directory
 bind__remove_distribution_directories: []
-
 bind__remove_distribution_files: []
 
 
@@ -25,6 +24,8 @@ bind__service_group: '{{ bind__service_user }}'
 
 # The name of the system service
 bind__service_name: bind9
+
+# Determine if the service will be enabled
 bind__service_enabled: true
 
 # optionnal path to the environment file
@@ -89,6 +90,8 @@ bind__session_keyfile: '{{ bind__service_run_directory }}/session.key'
 # Configure ACLs
 # each one must have {name: 'friendly name', 'match': ['any', '0.0.0.0/24']}
 bind__config_acls: '{{ bind__config_directory }}/named.conf.acls'
+
+# List of user defined acls
 bind__acls: []
 
 # Default location for rndc management key
@@ -137,7 +140,7 @@ bind__default_zones:
     source_url: https://www.internic.net/domain/named.cache
     # the url from which to retrieve the root names servers list
     source_checksum:
-      'sha256:f87fb9ae71625ee0850bc107a1959cb41f838302ae30a3be1a2c3d7ad65e56e7'
+      'sha256:a003be56acb66b2c9f77fb4685919bba36094f631b8b2f9bb6599220ebe31219'
     # Don't produce fail state if the checksum mismatch
     source_ignore_errors: false
   localhost.localdomain:
