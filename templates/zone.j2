@@ -1,7 +1,5 @@
 {%- import '_macros.j2' as macros with context -%}
-;
-; {{ ansible_managed }}
-;
+{{ ansible_managed|comment(decoration='; ') }}
 
 ; This file contains the zone declarations for zone {{ bind__zone.name }}
 {% set zone = bind__zone %}
@@ -29,7 +27,7 @@ $ORIGIN {{ macros.fqdn(domain) }}
                     bind__zones_entry_default['SOA']['data']
                     |combine({
                       'ns': first_ns[0],
-                      'serial': _bind__zones_serial[domain]|d( bind__zones_entry_default['SOA']['data']['serial'] )
+                      'serial': _bind__zone_serial|d( bind__zones_entry_default['SOA']['data']['serial'] )
                     })
               })
 }}

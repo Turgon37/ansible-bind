@@ -104,8 +104,22 @@ zone "{{ name }}" {{ config.class|d('IN') }} {
                     ' ' * 80, spec.data.expiry, ' ; Expire \n',
                     ' ' * 80, spec.data.negative, ' ; Negative Cache TTL \n',
                     ' ' * 80, ')'] | join(' ') %}
+{% elif type in ['TXT', 'SPF'] %}
+{%   set _chunks = [] %}
+{# split the full record data into 255 caracters chunks #}
+{%   for i in range(0, spec.data|length, 255) %}
+{%     set _ = _chunks.append('"'~(spec.data[i:i+255]|regex_replace('(["\\\])', '\\\\\\1'))~'"') %}
+{%   endfor %}
+{%   if _chunks|length == 0 %}
+{%     set data = '"empty"' %}
+{%   elif _chunks|length == 1 %}
+{%     set data = _chunks[0] %}
+{%   else %}
+{%     set data = '('~_chunks|join(' ')~')' %}
+{%   endif %}
 {% else %}
-{%   set data = spec.data | d('') %}
+{%   set data = spec.data|d('') %}
 {% endif %}
-{{ name }}                 {{ ttl }}      {{ class }}     {{ type }}   {{ data }} {% if spec.comment is defined %} ; {{ spec.comment }}{% endif %}
+{% if spec.comment is defined %}; {{ spec.comment }}{% endif %}
+{{ name }}                 {{ ttl }}      {{ class }}     {{ type|upper }}   {{ data }}
 {%- endmacro -%}

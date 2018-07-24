@@ -60,6 +60,8 @@
       "{{ bind__zones_entry_default['SOA']['data']['serial'] }}"
   when: _bind__zone_serial is not defined
     or _bind__zone_serial is not match('2[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}')
+  changed_when: _bind__zone_serial is not defined
+    or _bind__zone_serial is not match('2[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}')
   tags: ['bind', 'bind-configure', 'bind-zone']
 
 - name: Download zone file from url
@@ -97,7 +99,7 @@
               is match(bind__zones_entry_default['SOA']['data']['serial'][:-2])
             else bind__zones_entry_default['SOA']['data']['serial'] }}"
   when: _bind__master_zone_template is changed and _bind__zone_serial|length
-  notify: ['reload-bind']
+  changed_when: _bind__master_zone_template is changed and _bind__zone_serial|length
   tags: ['bind', 'bind-configure', 'bind-zone']
 
 - name: Install zone file if zone is master (second time with new serial)

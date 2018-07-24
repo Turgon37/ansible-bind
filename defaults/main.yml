@@ -270,6 +270,3 @@ bind__allowed_rr_types:
   - TSIG
   - TXT
   - URI
-
-# Working values
-_bind__zones_serial: {}
