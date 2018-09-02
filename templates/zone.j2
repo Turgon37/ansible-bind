@@ -20,7 +20,7 @@ $ORIGIN {{ macros.fqdn(domain) }}
 
 {% if first_soa|length == 0 %}
 {# generate an SOA entry with the provided defaults values #}
-{{   macros.rr(  {
+{{   macros.rrentry(  {
                   'name':'@',
                   'type':'SOA',
                   'data':
@@ -33,13 +33,13 @@ $ORIGIN {{ macros.fqdn(domain) }}
 }}
 {% else %}
 {# use the given SOA entry #}
-{{   macros.rr(first_soa[0]) }}
+{{   macros.rrentry(first_soa[0]) }}
 {% endif %}
 ;
 {% for entry in zone.entries | d([]) %}
 {#   ## ignore other SOA entries #}
 {%   if entry.type == 'SOA' %}
 {%   else %}
-{{     macros.rr(entry) }}
+{{     macros.rrentry(entry) }}
 {%   endif %}
 {% endfor %}

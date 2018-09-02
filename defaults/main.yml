@@ -140,7 +140,7 @@ bind__default_zones:
     source_url: https://www.internic.net/domain/named.cache
     # the url from which to retrieve the root names servers list
     source_checksum:
-      'sha256:a003be56acb66b2c9f77fb4685919bba36094f631b8b2f9bb6599220ebe31219'
+      'sha256:ead216a387e68703a669f30d3be60aa5453e18d0ae1e11e54080f007715e8652'
     # Don't produce fail state if the checksum mismatch
     source_ignore_errors: false
   localhost.localdomain:
@@ -220,10 +220,10 @@ bind__zones_entry_default:
         ansible_date_time.year~
         ansible_date_time.month~
         ansible_date_time.day~'00' }}"
-      refresh: 604800
-      retry: 86400
+      refresh: 86400
+      retry: 900
       expiry: 2419200
-      negative: 604800
+      negative: 3600
 
 # List of allowed RR class
 bind__allowed_rr_class:
