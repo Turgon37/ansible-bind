@@ -1,6 +1,4 @@
-//
-// {{ ansible_managed }}
-//
+{{ ansible_managed|comment(decoration='// ') }}
 
 {% if bind__acls | length > 0 %}
 // Define ACL

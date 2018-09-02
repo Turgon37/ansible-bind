@@ -62,7 +62,7 @@
     mode: 0770
     state: directory
 
-- name: Install bind default configuration file
+- name: Install bind service environment file
   template:
     src: bind.environment.j2
     dest: '{{ bind__service_environment }}'
