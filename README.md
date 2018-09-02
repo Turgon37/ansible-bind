@@ -2,6 +2,8 @@ Ansible Role Bind DNS server
 =========
 
 [![Build Status](https://travis-ci.org/Turgon37/ansible-bind.svg?branch=master)](https://travis-ci.org/Turgon37/ansible-bind)
+[![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
+[![Ansible Role](https://img.shields.io/badge/ansible%20role-Turgon37.bind-blue.svg)](https://galaxy.ansible.com/Turgon37/bind/)
 
 :warning: This role is under development, some important (and possibly breaking) changes may happend. Don't use it in production level environments but you can eventually base your own role on this one :hammer:
 
@@ -30,7 +32,9 @@ At this day the role can be used to :
 
   * install bind9
   * perform basic configuration
-  * define static zones (with automatic SOA entries and zone's serials numbers computation)
+  * define static zones with
+      * automatic SOA entries and zone's serials numbers computation
+      * templating from inventory or a remote url (and checksum check)
   * define slaves zones
   * install updated root server list
   * [local facts](#facts)
