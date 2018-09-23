@@ -20,7 +20,7 @@ install:
     'testinfra>=1.7.0'
 
 script:
-  - travis_wait 30 molecule test --all
+  - travis_wait 60 molecule test --all
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
