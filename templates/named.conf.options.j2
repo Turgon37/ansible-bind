@@ -60,11 +60,11 @@ options {
 {% endfor %}
     };
 
-    {% if bind__nat64_enable %}
+{% if bind__nat64_enable %}
     dns64 {{ bind__nat64_network_pool }} {
-            clients { any; };
+        clients { any; };
     };
-    {% endif %}
+{% endif %}
 
     ////// REQUEST PERMISSIONS
     // List of hosts to server will respond to
