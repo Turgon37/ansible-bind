@@ -4,14 +4,14 @@
   assert:
     that:
       - bind__zone is defined
-      - bind__zone.name is defined and ' ' not in bind__zone.name
+      - bind__zone.name is defined and bind__zone.name is match('^[a-zA-Z0-9.-]+$')
       - bind__zone.type is defined
     msg: >
       bind__zone must be defined with specifications and
       bind__zone.name must contains the name of the zone without any spaces
   tags: ['always']
 
-- name: 'Init some value for {{ bind__zone.name }}'
+- name: "Init some values for zone '{{ bind__zone.name }}'"
   set_fact:
     # this block must be synchronized with _macros.js one
     _bind__zone_file_path: "
@@ -30,13 +30,13 @@
       {%- endif -%}"
   tags: ['always']
 
-- name: 'Test if static zone file exists for {{ bind__zone.name }}'
+- name: "Test if static zone file exists for zone '{{ bind__zone.name }}'"
   stat:
     path: '{{ _bind__zone_file_path }}'
   register: _bind__zone_stat
   tags: ['bind', 'bind-configure', 'bind-zone']
 
-- name: 'Get current raw zone serial for {{ bind__zone.name }}'
+- name: "Get current raw zone serial for zone '{{ bind__zone.name }}'"
   command: /usr/bin/env grep '; Serial' '{{ _bind__zone_file_path }}'
   when: _bind__zone_stat.stat.exists and bind__zone.type in ['master']
   register: _bind__zone_serial_raw
@@ -45,25 +45,27 @@
   check_mode: false
   tags: ['bind', 'bind-configure', 'bind-zone']
 
-- name: 'Register zone serial for {{ bind__zone.name }}'
+- name: "Register current zone serial for zone '{{ bind__zone.name }}'"
   set_fact:
-    _bind__zone_serial:
-      "{{ _bind__zone_serial_raw.stdout|regex_search('[0-9]+') }}"
-  when: _bind__zone_stat.stat.exists
-    and bind__zone.type in ['master']
+    _bind__zone_serial: "{{ _bind__zone_serial_raw.stdout|regex_search('[0-9]+') }}"
+  when: bind__zone.type in ['master']
+    and _bind__zone_stat.stat.exists
     and _bind__zone_serial_raw is success
   tags: ['bind', 'bind-configure', 'bind-zone']
 
-- name: 'Generate new serial if serial is badly formatted for {{ bind__zone.name }}'
+- name: "Generate new serial if serial is badly formatted for zone '{{ bind__zone.name }}'"
   set_fact:
     _bind__zone_serial: "{{ bind__zones_entry_default['SOA']['data']['serial'] }}"
-  when: _bind__zone_serial is not defined
-    or _bind__zone_serial is not match('2[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}')
-  changed_when: _bind__zone_serial is not defined
+  when: bind__zone.type in ['master']
+    and (
+      not _bind__zone_serial
+      or _bind__zone_serial is not match('2[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}')
+    )
+  changed_when: not _bind__zone_serial
     or _bind__zone_serial is not match('2[0-9]{3}[0-9]{2}[0-9]{2}[0-9]{2}')
   tags: ['bind', 'bind-configure', 'bind-zone']
 
-- name: 'Download zone file from url for {{ bind__zone.name }}'
+- name: "Download zone file from url for zone '{{ bind__zone.name }}'"
   get_url:
     url: '{{ bind__zone.source_url }}'
     dest: '{{ _bind__zone_file_path }}'
@@ -76,7 +78,7 @@
   notify: ['reload-bind']
   tags: ['bind', 'bind-configure', 'bind-zone']
 
-- name: 'Install zone file if zone is master for {{ bind__zone.name }}'
+- name: "Install zone file if zone is master for zone '{{ bind__zone.name }}'"
   template:
     src: zone.j2
     dest: '{{ _bind__zone_file_path }}'
@@ -89,7 +91,7 @@
   notify: ['reload-bind']
   tags: ['bind', 'bind-configure', 'bind-zone']
 
-- name: 'Update serial if zone has changed for {{ bind__zone.name }}'
+- name: "Update serial if zone has changed for zone '{{ bind__zone.name }}'"
   set_fact:
     _bind__zone_serial:
       "{{  _bind__zone_serial[:-2]~
@@ -101,7 +103,7 @@
   changed_when: _bind__master_zone_template is changed and _bind__zone_serial|length
   tags: ['bind', 'bind-configure', 'bind-zone']
 
-- name: 'Install zone file if zone is master (second time with new serial) for {{ bind__zone.name }}'
+- name: "Install zone file if zone is master (second time with new serial) for '{{ bind__zone.name }}'"
   template:
     src: zone.j2
     dest: '{{ _bind__zone_file_path }}'

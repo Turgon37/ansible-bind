@@ -7,7 +7,7 @@
     state: present
   notify: ['restart-bind']
 
-- name: "Ensure bind user '{{ bind__service_user }}' is present"
+- name: "Ensure bind user '{{ bind__service_user }}' is present (first try)"
   user:
     name: '{{ bind__service_user }}'
     group: '{{ bind__service_group }}'

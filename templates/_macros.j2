@@ -77,11 +77,11 @@ zone "{{ name }}" {{ config.class|d('IN') }} {
  # @return the RR data field
  #}
 {%- macro rrdata(data) -%}
-{% if data is string %}
-{{ data }}
-{% else %}
-{{ (['(']|union(data)|union([')']))|join('\n')|indent(92) }}
-{% endif %}
+{%- if data is string -%}
+{{   data }}
+{%- else -%}
+{{   (['(']|union(data)|union([')']))|join('\n')|indent(92) }}
+{%- endif -%}
 {%- endmacro -%}
 
 {#
@@ -141,8 +141,8 @@ zone "{{ name }}" {{ config.class|d('IN') }} {
 {% else %}
 {%   set data = spec.data|d('') %}
 {% endif %}
-{%- if spec.comment is defined %}
-{{ spec.comment|comment(decoration='; ') }}
+{%- if spec.comment is defined -%}
+{{   spec.comment|comment(decoration='; ') }}
 {% endif -%}
 {{ '%-70s %-10s %-2s %-10s %-100s'|format(name, ttl, class, type|upper, rrdata(data)) }}
 {%- endmacro -%}
