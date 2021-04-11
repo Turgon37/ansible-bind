@@ -13,6 +13,9 @@ galaxy_info:
     - name: EL
       versions:
         - 7
+    - name: Ubuntu
+      versions:
+        - focal
   galaxy_tags:
     - bind
     - dns

@@ -1,12 +1,18 @@
 ---
 
-- name: Install bind.service systemd unit file
+- name: Ensure systemd override directory is created
+  file:
+    path: '/etc/systemd/system/{{ bind__service_name }}.service.d'
+    state: directory
+  when: ansible_service_mgr == 'systemd'
+
+- name: Install systemd options override file
   template:
-    src: bind.service.j2
-    dest: '/etc/systemd/system/{{ bind__service_name }}.service'
+    src: systemd.service.d.j2
+    dest: '/etc/systemd/system/{{ bind__service_name }}.service.d/ansible.conf'
     owner: root
     group: root
-    mode: 0755
+    mode: 0644
   when: ansible_service_mgr == 'systemd'
   register: _bind__service
   notify: ['restart-bind']

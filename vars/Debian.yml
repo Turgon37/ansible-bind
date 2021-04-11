@@ -10,4 +10,5 @@ bind__remove_distribution_directories:
 
 bind__service_sysvinit_script: /etc/init.d/bind9
 
+# TODO : to remove
 bind__service_environment: /etc/default/bind9

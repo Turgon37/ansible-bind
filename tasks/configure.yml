@@ -15,7 +15,32 @@
     createhome: false
     system: true
     state: present
+  register: _bind__service_user_changed
+  ignore_errors: true
   notify: ['restart-bind']
+
+- name: Stop service before user update
+  service:
+    name: '{{ bind__service_name }}'
+    state: stopped
+  when: _bind__service_user_changed is failed
+
+- name: "Ensure bind user '{{ bind__service_user }}' is present (second try)"
+  user:
+    name: '{{ bind__service_user }}'
+    group: '{{ bind__service_group }}'
+    shell: /bin/false
+    createhome: false
+    system: true
+    state: present
+  when: _bind__service_user_changed is failed
+  notify: ['restart-bind']
+
+- name: Start service after user update
+  service:
+    name: '{{ bind__service_name }}'
+    state: started
+  when: _bind__service_user_changed is failed
 
 - name: Remove distribution specific directories
   file:
@@ -41,7 +66,6 @@
     - '{{ bind__zones_directory }}'
     - '{{ bind__static_zones_directory }}'
     - '{{ bind__keys_directory }}'
-    - '{{ bind__var_directory }}'
 
 - name: Ensure bind read and write configurations directories exists
   file:
@@ -51,6 +75,7 @@
     mode: 0770
     state: directory
   with_items:
+    - '{{ bind__var_directory }}'
     - '{{ bind__dynamic_zones_directory }}'
     - '{{ bind__managed_keys_directory }}'
 
@@ -62,13 +87,11 @@
     mode: 0770
     state: directory
 
+# TODO : to remove
 - name: Install bind service environment file
-  template:
-    src: bind.environment.j2
-    dest: '{{ bind__service_environment }}'
-    owner: root
-    group: root
-    mode: 0644
+  file:
+    path: '{{ bind__service_environment }}'
+    state: absent
   when: bind__service_environment is defined
   notify: ['restart-bind']
 

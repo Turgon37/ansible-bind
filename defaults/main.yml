@@ -37,8 +37,11 @@ bind__service_enabled: true
 # the path to the bind exectuable
 bind__service_executable: /usr/sbin/named
 
+# optional service additionnals options
+bind__service_options:
+
 # the path to the pidfile of bind
-bind__pid_file: '{{ bind__service_run_directory}}/bind.pid'
+bind__pid_file: '{{ bind__service_run_directory}}/{{ bind__service_name }}.pid'
 
 # Main configuration directory
 bind__config_directory: /etc/bind
@@ -46,7 +49,7 @@ bind__config_directory: /etc/bind
 bind__config_file: '{{ bind__config_directory }}/named.conf'
 
 # runtime directory for service configuration
-bind__service_run_directory: /var/run/bind
+bind__service_run_directory: '/var/run/{{ bind__service_name }}'
 
 # Working directory with run-time stuff
 bind__var_directory: /var/bind

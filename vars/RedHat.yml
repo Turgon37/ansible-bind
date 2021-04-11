@@ -15,6 +15,7 @@ bind__remove_distribution_files:
 bind__service_name: named
 bind__service_user: named
 
+# TODO : to remove
 bind__service_environment: /etc/sysconfig/named
 
 bind__rndc_keyfile: /etc/rndc.key

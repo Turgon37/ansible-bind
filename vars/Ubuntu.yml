@@ -1,0 +1,15 @@
+---
+
+bind__packages_names:
+  - bind9
+  - bind9utils
+
+bind__service_name: named
+
+#bind__remove_distribution_directories:
+#  - /var/cache/bind
+
+# TODO : to remove
+bind__service_environment: /etc/default/bind9
+
+bind__var_directory: /var/lib/bind
