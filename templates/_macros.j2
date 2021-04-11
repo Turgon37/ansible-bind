@@ -137,6 +137,12 @@ zone "{{ name }}" {{ config.class|d('IN') }} {
 {%   else %}
 {%     set data = '('~_chunks|join(' ')~')' %}
 {%   endif %}
+{% elif type in ['SSHFP'] %}
+{%   set data = [
+                  spec.data.algorithm~' ; Algorithm',
+                  spec.data.type~' ; Type',
+                  spec.data.fingerprint,
+                ] %}
 {### OTHER ###}
 {% else %}
 {%   set data = spec.data|d('') %}

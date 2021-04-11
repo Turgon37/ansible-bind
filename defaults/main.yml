@@ -272,3 +272,10 @@ bind__allowed_rr_types:
   - TSIG
   - TXT
   - URI
+
+# Mapping of ansible_fact and SSHFP key types
+bind__sshfp_facts_key_type_mapping:
+  ansible_ssh_host_key_ecdsa_public: ecdsa-sha2-nistp256
+  ansible_ssh_host_key_ed25519_public: ssh-ed25519
+  ansible_ssh_host_key_rsa_public: ssh-rsa
+  ansible_ssh_host_key_dsa_public: ssh-dss

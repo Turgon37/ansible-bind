@@ -22,7 +22,8 @@ Require Ansible >= 2.4
 This role is available for
 
   * CentOS 7
-  * Debian 8/9
+  * Debian 8/9/10
+  * Ubuntu
 
 ## Features
 
@@ -58,10 +59,8 @@ The variables that can be passed to this role and a brief description about them
 | bind__allow_recursion_on          | String/List of string    | List of network addresses to listen for recursion queries                |
 | bind__empty_contact               | String                   | Default contact address empty zones                                      |
 | bind__empty_server                | String                   | Default NS entry for empty zones                                         |
-| bind__global_zones                | Dict of zones statements | List of zones intended to be set globally                                |
-| bind__group_zones                 | Dict of zones statements | List of zones intended to be set at host groups level                    |
-| bind__host_zones                  | Dict of zones statements | List of zones intended to be set at host level                           |
-| bind__root_server_source_checksum | String                   | The checksum value of                                                    |
+| bind__zones_global/group/host     | Dict of zones statements | List of zones intended to be set globally per group or host              |
+| bind__root_server_source_checksum | String                   | The checksum value of root servers zone                                  |
 
 Each zones dict bind__(global|group|host)_zones parameters are merged before being applied by ansible, so it let you to define zones in multiple place of Ansible inventory.
 
@@ -141,6 +140,7 @@ Some RR types are implemented directly by this role, so you have to format the '
 This is the list of specifically implemented types :
 
 * [SOA](#soa-type)
+* [SSHFP](#sshfp-type)
 
 #### SOA type
 
@@ -155,15 +155,48 @@ If you choose to provide by yourself the SOA record please set all the following
 - name: '@' # the name of your zone
   type: SOA # mandatory
   data:
-    ns: 'server1'                 # the fqdn of your main name server
-      email: 'admin@example.com'   # the administrator email, any arobase sign will be converted to dot
-      serial:   "00000000"        # The serial (please ensure that it is correctly updated at each zone changes)
-      refresh:  604800            # refresh time for slave servers
-      retry:    86400             # time between slave retry attempts
-      expiry:   2419200           # expiry time considered by slave for this zone
-      negative: 604800            # minimum time/default ttl (see implementations according to your version of bind)
+    ns: 'server1'               # the fqdn of your main name server
+    email: 'admin@example.com'  # the administrator email, any arobase sign will be converted to dot
+    serial: "00000000"          # The serial (please ensure that it is correctly updated at each zone changes)
+    refresh: 604800             # refresh time for slave servers
+    retry: 86400                # time between slave retry attempts
+    expiry: 2419200             # expiry time considered by slave for this zone
+    negative: 604800            # minimum time/default ttl (see implementations according to your version of bind)
 ```
 
+#### SSHFP type
+
+```
+- name: 'host' # the name of your host
+  type: SSHFP # mandatory
+  data:
+    algorithm: 2   # algorithm integer
+    type:      1   # key type integer
+    fingerprint: 0C130CDFAF53DB6146232855D9A072  # raw fingerprint
+```
+
+For conveniance a filter that generate needed value is included with this role
+
+```
+- name: 'host'
+  type: SSHFP
+  data: "{{ ansible_ssh_host_key_rsa_public|sshfp_record_data_from_key('ssh-rsa', 'SHA-1') }}"
+```
+
+I recommend you to use a loop to generate theses entries
+
+```
+{% for fact_name, key_type in bind__sshfp_facts_key_type_mapping|dictsort if vars[sshfp_fact_name] is defined -%}
+{%   set _ = zone.entries.append({
+       'name': inventory_hostname,
+       'type': 'SSHFP',
+       'data': vars[fact_name]|sshfp_record_data_from_key(key_type, 'SHA-1') }) -%}
+{%   set _ = zone.entries.append({
+       'name': hostname|replace('.'~zone_name, ''),
+       'type': 'SSHFP',
+       'data': vars[fact_name]|sshfp_record_data_from_key(key_type, 'SHA-256') }) -%}
+{% endfor -%}
+```
 
 ### Features
 
