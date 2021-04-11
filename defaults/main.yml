@@ -128,6 +128,10 @@ bind__disable_empty_zone: []
 bind__forward: first
 bind__forwarders: []
 
+# Nat64 settings
+bind__nat64_enable: false
+bind__nat64_network_pool: fd99::/96
+
 # Path to zones directory
 bind__zones_directory: '{{ bind__config_directory }}/zones'
 # Default location of static zones
