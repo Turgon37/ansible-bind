@@ -15,30 +15,35 @@
   set_fact:
     # this block must be synchronized with _macros.js one
     _bind__zone_file_path: "
-      {%- if bind__zone.file == 'auto' -%}
-      {%-   if bind__zone.type in ['master'] -%}
-        {{ bind__static_zones_directory }}/db.{{ bind__zone.name }}
+      {%- if bind__zone.type in ['master','hint','slave'] %}
+      {%-   if bind__zone.file == 'auto' -%}
+      {%-     if bind__zone.type in ['master'] -%}
+      {{        bind__static_zones_directory }}/db.{{ bind__zone.name }}
+      {%-     else -%}
+      {{        bind__dynamic_zones_directory }}/db.{{ bind__zone.name }}
+      {%-     endif -%}
       {%-   else -%}
-        {{ bind__dynamic_zones_directory }}/db.{{ bind__zone.name }}
-      {%-   endif -%}
-      {%- else -%}
-      {%-   if bind__zone.file is match('^/') -%}
-        {{ bind__zone.file }}
-      {%-   else -%}
-        {{ bind__static_zones_directory}}/{{ bind__zone.file }}
+      {%-     if bind__zone.file is match('^/') -%}
+      {{        bind__zone.file }}
+      {%-     else -%}
+      {{        bind__static_zones_directory}}/{{ bind__zone.file }}
+      {%-     endif -%}
       {%-   endif -%}
       {%- endif -%}"
+    _bind__zone_serial:
   tags: ['always']
 
 - name: "Test if static zone file exists for zone '{{ bind__zone.name }}'"
   stat:
     path: '{{ _bind__zone_file_path }}'
+  when: bind__zone.type in ['master']
   register: _bind__zone_stat
   tags: ['bind', 'bind-configure', 'bind-zone']
 
 - name: "Get current raw zone serial for zone '{{ bind__zone.name }}'"
   command: /usr/bin/env grep '; Serial' '{{ _bind__zone_file_path }}'
-  when: _bind__zone_stat.stat.exists and bind__zone.type in ['master']
+  when: bind__zone.type in ['master']
+    and _bind__zone_stat.stat.exists
   register: _bind__zone_serial_raw
   failed_when: _bind__zone_serial_raw.rc not in [0, 1]
   changed_when: false
@@ -99,8 +104,11 @@
             if _bind__zone_serial[:-2]
               is match(bind__zones_entry_default['SOA']['data']['serial'][:-2])
             else bind__zones_entry_default['SOA']['data']['serial'] }}"
-  when: _bind__master_zone_template is changed and _bind__zone_serial|length
-  changed_when: _bind__master_zone_template is changed and _bind__zone_serial|length
+  when: _bind__master_zone_template is changed
+    and _bind__zone_stat.stat.exists
+    and _bind__zone_serial|length
+  changed_when: _bind__master_zone_template is changed
+    and _bind__zone_serial|length
   tags: ['bind', 'bind-configure', 'bind-zone']
 
 - name: "Install zone file if zone is master (second time with new serial) for '{{ bind__zone.name }}'"
@@ -111,6 +119,7 @@
     group: '{{ bind__service_group }}'
     mode: 0640
     validate: "{{ bind__checkzone_program }} '{{ bind__zone.name }}' %s"
-  when: bind__zone.type in ['master']
+  when: _bind__master_zone_template is changed
+    and _bind__zone_stat.stat.exists
   notify: ['reload-bind']
   tags: ['bind', 'bind-configure', 'bind-zone']

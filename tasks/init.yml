@@ -18,7 +18,7 @@
   assert:
     that:
       - item.value.type is defined
-        and item.value.type in ['hint', 'master', 'slave']
+        and item.value.type in ['hint', 'master', 'slave', 'forward']
       - item.value.class is not defined
         or item.value.class is defined and item.value.class in ['IN']
   with_dict: '{{ bind__zones }}'

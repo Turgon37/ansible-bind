@@ -46,19 +46,23 @@
 {%- macro zone(name, config) -%}
 zone "{{ name }}" {{ config.class|d('IN') }} {
   type {{ config.type }};
-{% if config.file == 'auto' %}
-{%   if config.type in ['master'] %}
+{# ZONE THAT REQUIRES FILE #}
+{% if config.type in ['master','slave', 'hint'] %}
+{%   if config.file == 'auto' %}
+{%     if config.type in ['master'] %}
   file "{{ bind__static_zones_directory }}/db.{{ name }}";
-{%   else %}
+{%     else %}
   file "{{ bind__dynamic_zones_directory }}/db.{{ name }}";
-{%   endif %}
-{% else %}
-{%   if config.file is match("^/") %}
-  file "{{ config.file }}";
+{%     endif %}
 {%   else %}
+{%     if config.file is match("^/") %}
+  file "{{ config.file }}";
+{%     else %}
   file "{{ bind__static_zones_directory}}/{{ config.file }}";
+{%     endif %}
 {%   endif %}
 {% endif %}
+{# ZONE SETTINGS #}
 {% if config.allow_update is defined %}
   allow-update { {{ listify(config.allow_update) }} };
 {% endif %}
