@@ -36,7 +36,7 @@ $ORIGIN {{ macros.fqdn(domain) }}
 {{   macros.rrentry(first_soa[0]) }}
 {% endif %}
 ;
-{% for entry in zone.entries | d([]) %}
+{% for entry in zone.entries|d([]) %}
 {#   ## ignore other SOA entries #}
 {%   if entry.type == 'SOA' %}
 {%   else %}

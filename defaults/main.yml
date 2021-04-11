@@ -37,8 +37,11 @@ bind__service_enabled: true
 # the path to the bind exectuable
 bind__service_executable: /usr/sbin/named
 
+# optional service additionnals options
+bind__service_options:
+
 # the path to the pidfile of bind
-bind__pid_file: '{{ bind__service_run_directory}}/bind.pid'
+bind__pid_file: '{{ bind__service_run_directory}}/{{ bind__service_name }}.pid'
 
 # Main configuration directory
 bind__config_directory: /etc/bind
@@ -46,7 +49,7 @@ bind__config_directory: /etc/bind
 bind__config_file: '{{ bind__config_directory }}/named.conf'
 
 # runtime directory for service configuration
-bind__service_run_directory: /var/run/bind
+bind__service_run_directory: '/var/run/{{ bind__service_name }}'
 
 # Working directory with run-time stuff
 bind__var_directory: /var/bind
@@ -125,6 +128,10 @@ bind__disable_empty_zone: []
 bind__forward: first
 bind__forwarders: []
 
+# Nat64 settings
+bind__nat64_enable: false
+bind__nat64_network_pool: fd99::/96
+
 # Path to zones directory
 bind__zones_directory: '{{ bind__config_directory }}/zones'
 # Default location of static zones
@@ -133,14 +140,13 @@ bind__static_zones_directory: '{{ bind__zones_directory }}/static'
 bind__dynamic_zones_directory: '{{ bind__zones_directory }}/dynamic'
 
 # List of default zones
-bind__default_zones:
+bind__zones_default:
   '.':
     type: hint
     file: db.root
     source_url: https://www.internic.net/domain/named.cache
     # the url from which to retrieve the root names servers list
-    source_checksum:
-      'sha256:18dc5af7b8113d1ef4bb896f9b0beb808755a7ec52be4798fe9332aa27c2553f'
+    source_checksum: 'sha256:ff8160c027e24d079c8396742e4c8cd92fa0268e403f3e8535a09d5fba98e204'
     # Don't produce fail state if the checksum mismatch
     source_ignore_errors: false
   localhost.localdomain:
@@ -193,20 +199,22 @@ bind__default_zones:
         data: 'localhost.'
 
 # This variable is intended to be used in Ansible’s global inventory.
-bind__global_zones: {}
+bind__zones_global: {}
 
 # This variable is intended to be used in a host inventory group of Ansible
 # (only one host group is supported).
-bind__group_zones: {}
+bind__zones_group: {}
 
 # This variable is intended to be used in the inventory of hosts.
-bind__host_zones: {}
+bind__zones_host: {}
 
-# Combine all enabled mods
-bind__zones: '{{ bind__default_zones
-                     | combine(bind__global_zones)
-                     | combine(bind__group_zones)
-                     | combine(bind__host_zones) }}'
+# Combine all zones settings
+bind__zones: '{{
+    bind__zones_default
+    |combine(bind__zones_global)
+    |combine(bind__zones_group)
+    |combine(bind__zones_host)
+  }}'
 
 # Default TTL
 bind__zones_default_ttl: 604800
@@ -270,3 +278,10 @@ bind__allowed_rr_types:
   - TSIG
   - TXT
   - URI
+
+# Mapping of ansible_fact and SSHFP key types
+bind__sshfp_facts_key_type_mapping:
+  ansible_ssh_host_key_ecdsa_public: ecdsa-sha2-nistp256
+  ansible_ssh_host_key_ed25519_public: ssh-ed25519
+  ansible_ssh_host_key_rsa_public: ssh-rsa
+  ansible_ssh_host_key_dsa_public: ssh-dss

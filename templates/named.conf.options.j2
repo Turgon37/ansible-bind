@@ -60,6 +60,12 @@ options {
 {% endfor %}
     };
 
+{% if bind__nat64_enable %}
+    dns64 {{ bind__nat64_network_pool }} {
+        clients { any; };
+    };
+{% endif %}
+
     ////// REQUEST PERMISSIONS
     // List of hosts to server will respond to
     allow-query { {{ macros.listify(bind__allow_query) }} };

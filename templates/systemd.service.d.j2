@@ -1,0 +1,14 @@
+{{ ansible_managed|comment(decoration='# ') }}
+
+[Unit]
+After=named-setup-rndc.service
+Wants=nss-lookup.target
+Wants=named-setup-rndc.service
+
+[Service]
+EnvironmentFile=
+PIDFile={{ bind__pid_file }}
+ExecStartPre=
+ExecStartPre=/usr/bin/env install --directory {{ bind__service_run_directory }} --owner {{ bind__service_user }} --group {{ bind__service_group }} --mode 755
+ExecStart=
+ExecStart={{ [bind__service_executable, '-f', '-u', bind__service_user, '-c', bind__config_file, bind__service_options]|reject('none')|join(' ') }}

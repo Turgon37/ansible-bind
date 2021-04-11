@@ -3,8 +3,7 @@
 - name: Setup zones
   include_tasks: types/zone.yml
   vars:
-    bind__zone:
-      "{{ outer_item.value|combine({'name': outer_item.key}) }}"
+    bind__zone: "{{ outer_item.value|combine({'name': outer_item.key}) }}"
   with_dict: '{{ bind__zones }}'
   loop_control:
     loop_var: outer_item
