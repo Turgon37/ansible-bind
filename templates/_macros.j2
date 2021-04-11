@@ -114,10 +114,10 @@ zone "{{ name }}" {{ config.class|d('IN') }} {
 {% set name  = spec.name|d('') %}
 {% set ttl   = spec.ttl|d('') %}
 {% set class = spec.class|d('IN') %}
-{% set type  = spec.type %}
+{% set type  = spec.type -%}
 {# CONVERT SOME CUSTOM TYPES #}
 {### SOA ###}
-{% if type == 'SOA' %}
+{% if type == 'SOA' -%}
 {%   set data = [
                   spec.data.ns,
                   fqdn( emailify(spec.data.email) ),
